@@ -1,5 +1,5 @@
 use crate::model::{Teacher, MatchResult};
-use std::collections::{HashSet, HashMap, VecDeque};
+use std::collections::{HashSet, HashMap};
 
 pub fn find_matches(teachers: Vec<Teacher>) -> Vec<MatchResult> {
     let mut results = Vec::new();

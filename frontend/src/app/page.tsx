@@ -52,6 +52,8 @@ export default function Home() {
         setUserInfo({
           name: data.name || "未知使用者",
           picture: data.picture || "",
+          email: data.email || "",
+          google_id: data.google_id || "",
         });
   
         // 根據需要處理登入後的邏輯，例如設定當前使用者
@@ -98,27 +100,37 @@ export default function Home() {
     setLoading(true);
     setError("");
     try {
-      console.log("發送到後端的資料:", JSON.stringify(teacher, null, 2));
-      
+      if (!userInfo?.google_id) {
+        throw new Error("Google ID 未設定，請重新登入");
+      }
+  
+      // 確保將 `google_id` 包含在發送的資料中
+      const teacherWithGoogleId = {
+        ...teacher,
+        google_id: userInfo.google_id, // 使用 Google ID
+      };
+  
+      console.log("發送到後端的資料:", JSON.stringify(teacherWithGoogleId, null, 2));
+  
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/teachers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(teacher),
+        body: JSON.stringify(teacherWithGoogleId), // 傳遞包含 google_id 的資料
       });
-      
+  
       if (!response.ok) {
         const errorText = await response.text();
         console.error("API 錯誤回應:", response.status, errorText);
         throw new Error(`後端錯誤: ${response.status} ${response.statusText} - ${errorText}`);
       }
-      
+  
       // 儲存創建的教師資料
       const createdTeacher = await response.json();
       console.log("從後端收到的回應:", createdTeacher);
       setCurrentTeacher(createdTeacher);
-      
+  
       // 獲取配對結果
       await fetchData();
     } catch (err) {
@@ -213,7 +225,7 @@ export default function Home() {
             </button>
           </div>
           
-          <TeacherForm onSubmit={handleCreateTeacher} />
+          <TeacherForm onSubmit={handleCreateTeacher} defaultEmail={userInfo?.email} />
           {loading && <p style={{ textAlign: "center", marginTop: "10px" }}>處理中...</p>}
           {error && <p style={{ color: "red", textAlign: "center", marginTop: "10px" }}>{error}</p>}
         </div>

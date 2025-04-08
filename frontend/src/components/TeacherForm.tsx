@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect} from "react";
 
 interface Teacher {
   id?: number;
@@ -20,11 +20,11 @@ interface TeacherFormProps {
   defaultEmail?: string;
 }
 
-export default function TeacherForm({ onSubmit }: TeacherFormProps) {
+export default function TeacherForm({ onSubmit, defaultEmail }: TeacherFormProps) {
   const currentROCYear = new Date().getFullYear() - 1911;
   
   const [teacher, setTeacher] = useState<Teacher>({
-    email: "",
+    email: defaultEmail || "",
     year: currentROCYear,
     current_county: "",
     current_district: "",
@@ -32,6 +32,12 @@ export default function TeacherForm({ onSubmit }: TeacherFormProps) {
     target_counties: [""],
     target_districts: [""]
   });
+
+  useEffect(() => {
+    if (defaultEmail) {
+      setTeacher((prev) => ({ ...prev, email: defaultEmail }));
+    }
+  }, [defaultEmail]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -62,7 +68,7 @@ export default function TeacherForm({ onSubmit }: TeacherFormProps) {
     e.preventDefault();
     onSubmit(teacher);
     setTeacher({
-      email: "",
+      email: defaultEmail || "",
       year: currentROCYear,
       current_county: "",
       current_district: "",

@@ -6,7 +6,6 @@ use axum::{
     routing::{get, post},
     Router, extract::State,
     http::Method, extract::Json,
-    http::StatusCode,
 };
 use serde::Serialize;
 use serde::Deserialize;
@@ -94,17 +93,31 @@ async fn create_teacher(
     Json(mut teacher): Json<Teacher>
 ) -> Result<Json<Teacher>, (axum::http::StatusCode, String)> {
     tracing::info!("接收到的教師數據: {:?}", teacher);
-    
-    // 如果未提供姓名，設置一個默認值
+
+    // 如果名稱為空，設置為預設值
     if teacher.name.is_none() || teacher.name.as_ref().unwrap().is_empty() {
         teacher.name = Some("Anonymous".to_string());
     }
-    
-    // 生成匿名顯示ID（如果未提供）
+
+    // 如果 display_id 為空，生成一個新的 display_id
     if teacher.display_id.is_none() || teacher.display_id.as_ref().unwrap().is_empty() {
         teacher.display_id = Some(db::generate_display_id(&teacher.current_county, &teacher.current_district));
     }
-    
+
+    // 確保 google_id 被正確處理
+    match &teacher.google_id {
+        Some(google_id) if !google_id.is_empty() => {
+            tracing::info!("Google ID 已提供: {}", google_id);
+        }
+        _ => {
+            return Err((
+                axum::http::StatusCode::BAD_REQUEST,
+                "缺少 google_id，請重新登入".to_string(),
+            ));
+        }
+    }
+
+    // 將教師數據寫入資料庫
     match db::create_teacher(&pool, teacher).await {
         Ok(created) => {
             tracing::info!("成功創建教師: {:?}", created);
@@ -148,6 +161,7 @@ async fn google_login(
             // 返回使用者資訊
             Ok(Json(serde_json::json!({
                 "email": user_info.email,
+                "google_id": user_info.email,
                 "name": user_info.name,
                 "picture": user_info.picture,
                 "teacher": null // 這裡可以返回教師資訊（如果需要）

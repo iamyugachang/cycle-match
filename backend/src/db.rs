@@ -1,7 +1,6 @@
 use sqlx::{Pool, Postgres, Row};
 use crate::model::Teacher;
 use chrono::Utc;
-use rand::{thread_rng, Rng};
 use uuid::Uuid;
 
 // 用於生成顯示ID的函數
@@ -23,6 +22,7 @@ pub async fn get_all_teachers(pool: &Pool<Postgres>) -> Result<Vec<Teacher>, sql
             name,
             display_id,
             email,
+            google_id,
             year, 
             current_county,
             current_district,
@@ -42,6 +42,7 @@ pub async fn get_all_teachers(pool: &Pool<Postgres>) -> Result<Vec<Teacher>, sql
             name: row.get("name"),
             display_id: row.get("display_id"),
             email: row.get("email"),
+            google_id: row.get("google_id"),
             year: row.get("year"),
             current_county: row.get("current_county"),
             current_district: row.get("current_district"),
@@ -56,20 +57,18 @@ pub async fn get_all_teachers(pool: &Pool<Postgres>) -> Result<Vec<Teacher>, sql
 }
 
 pub async fn create_teacher(pool: &Pool<Postgres>, teacher: Teacher) -> Result<Teacher, sqlx::Error> {
-    // 確保姓名有值
     let name = teacher.name.clone().unwrap_or_else(|| format!("User-{}", Uuid::new_v4()));
-    
-    // 確保顯示ID有值
     let display_id = teacher.display_id.clone().unwrap_or_else(|| 
         generate_display_id(&teacher.current_county, &teacher.current_district)
     );
-    
+
     let row = sqlx::query(
         r#"
         INSERT INTO teachers (
             name,
             display_id,
             email,
+            google_id, -- 新增欄位
             year,
             current_county, 
             current_district, 
@@ -78,12 +77,13 @@ pub async fn create_teacher(pool: &Pool<Postgres>, teacher: Teacher) -> Result<T
             target_districts,
             created_at
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING 
             id, 
             name,
             display_id,
             email,
+            google_id, -- 新增欄位
             year,
             current_county, 
             current_district, 
@@ -96,6 +96,7 @@ pub async fn create_teacher(pool: &Pool<Postgres>, teacher: Teacher) -> Result<T
     .bind(&name)
     .bind(&display_id)
     .bind(&teacher.email)
+    .bind(&teacher.google_id)
     .bind(&teacher.year)
     .bind(&teacher.current_county)
     .bind(&teacher.current_district)
@@ -106,11 +107,12 @@ pub async fn create_teacher(pool: &Pool<Postgres>, teacher: Teacher) -> Result<T
     .fetch_one(pool)
     .await?;
 
-    let created_teacher = Teacher {
+    Ok(Teacher {
         id: row.get("id"),
         name: Some(row.get("name")),
         display_id: Some(row.get("display_id")),
         email: row.get("email"),
+        google_id: row.get("google_id"),
         year: row.get("year"),
         current_county: row.get("current_county"),
         current_district: row.get("current_district"),
@@ -118,9 +120,7 @@ pub async fn create_teacher(pool: &Pool<Postgres>, teacher: Teacher) -> Result<T
         target_counties: row.get("target_counties"),
         target_districts: row.get("target_districts"),
         created_at: row.get("created_at"),
-    };
-
-    Ok(created_teacher)
+    })
 }
 
 pub async fn init_db(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
@@ -137,6 +137,7 @@ pub async fn init_db(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name TEXT NOT NULL,
             display_id TEXT NOT NULL,
             email TEXT NOT NULL,
+            google_id TEXT,
             year INTEGER NOT NULL,
             current_county TEXT NOT NULL,
             current_district TEXT NOT NULL,
@@ -166,6 +167,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name: Some("測試教師1".to_string()),
             display_id: Some("台北市大安區001".to_string()),
             email: format!("test1@example.com"),
+            google_id: None,
             year: 114,
             current_county: "台北市".to_string(),
             current_district: "大安區".to_string(),
@@ -179,6 +181,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name: Some("測試教師2".to_string()),
             display_id: Some("台北市信義區002".to_string()),
             email: format!("test2@example.com"),
+            google_id: None,
             year: 114,
             current_county: "台北市".to_string(),
             current_district: "信義區".to_string(),
@@ -192,6 +195,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name: Some("測試教師3".to_string()),
             display_id: Some("台北市中正區003".to_string()),
             email: format!("test3@example.com"),
+            google_id: None,
             year: 114,
             current_county: "台北市".to_string(),
             current_district: "中正區".to_string(),
@@ -209,6 +213,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name: Some("測試教師4".to_string()),
             display_id: Some("新北市板橋區004".to_string()),
             email: format!("test4@example.com"),
+            google_id: None,
             year: 114,
             current_county: "新北市".to_string(),
             current_district: "板橋區".to_string(),
@@ -222,6 +227,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name: Some("測試教師5".to_string()),
             display_id: Some("新北市中和區005".to_string()),
             email: format!("test5@example.com"),
+            google_id: None,
             year: 114,
             current_county: "新北市".to_string(),
             current_district: "中和區".to_string(),
@@ -235,6 +241,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name: Some("測試教師6".to_string()),
             display_id: Some("新北市三重區006".to_string()),
             email: format!("test6@example.com"),
+            google_id: None,
             year: 114,
             current_county: "新北市".to_string(),
             current_district: "三重區".to_string(),
@@ -252,6 +259,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name: Some("測試教師7".to_string()),
             display_id: Some("台中市西區007".to_string()),
             email: format!("test7@example.com"),
+            google_id: None,
             year: 114,
             current_county: "台中市".to_string(),
             current_district: "西區".to_string(),
@@ -265,6 +273,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name: Some("測試教師8".to_string()),
             display_id: Some("台中市北區008".to_string()),
             email: format!("test8@example.com"),
+            google_id: None,
             year: 114,
             current_county: "台中市".to_string(),
             current_district: "北區".to_string(),
@@ -282,6 +291,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name: Some("測試教師9".to_string()),
             display_id: Some("桃園市中壢區009".to_string()),
             email: format!("test9@example.com"),
+            google_id: None,
             year: 114,
             current_county: "桃園市".to_string(),
             current_district: "中壢區".to_string(),
@@ -295,6 +305,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             name: Some("測試教師10".to_string()),
             display_id: Some("桃園市桃園區010".to_string()),
             email: format!("test10@example.com"),
+            google_id: None,
             year: 114,
             current_county: "桃園市".to_string(),
             current_district: "桃園區".to_string(),

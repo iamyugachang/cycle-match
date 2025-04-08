@@ -4,11 +4,10 @@ use chrono::{Utc, DateTime};
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Teacher {
     pub id: Option<i32>,
-    #[serde(default, skip_serializing)]  // 完全不使用名稱欄位
     pub name: Option<String>,
-    #[serde(default)]  // 允許缺失
     pub display_id: Option<String>,
     pub email: String,
+    pub google_id: Option<String>,
     pub year: i32,
     pub current_county: String,
     pub current_district: String,
