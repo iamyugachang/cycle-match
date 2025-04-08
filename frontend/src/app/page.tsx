@@ -31,6 +31,7 @@ export default function Home() {
   const [showForm, setShowForm] = useState(true);
   const [teacherInfo, setTeacherInfo] = useState<{id: number | undefined, email: string} | null>(null);
   const [userInfo, setUserInfo] = useState<{ name: string; picture: string } | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const handleGoogleLoginSuccess = (credentialResponse: any) => {
     console.log("Google 登入成功:", credentialResponse);
@@ -47,7 +48,7 @@ export default function Home() {
       .then((res) => res.json())
       .then((data) => {
         console.log("後端驗證成功:", data);
-  
+
         // 設定使用者資訊
         setUserInfo({
           name: data.name || "未知使用者",
@@ -55,9 +56,15 @@ export default function Home() {
           email: data.email || "",
           google_id: data.google_id || "",
         });
-  
-        // 根據需要處理登入後的邏輯，例如設定當前使用者
-        setCurrentTeacher(data.teacher);
+
+        // 根據後端返回的教師資訊決定顯示內容
+        if (data.teacher) {
+          setCurrentTeacher(data.teacher);
+          fetchData(); // 如果已登記，載入配對結果
+        } else {
+          setShowForm(true); // 如果未登記，顯示表單
+          setShowResults(false);
+        }
       })
       .catch((err) => {
         console.error("後端驗證失敗:", err);
@@ -76,15 +83,17 @@ export default function Home() {
     setLoading(true);
     setError("");
     try {
-      // 獲取配對結果
-      const matchResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/matches`);
+      // 獲取配對結果，無需依賴 google_id
+      const matchResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/matches`
+      );
       if (!matchResponse.ok) {
         throw new Error(`配對結果獲取失敗: ${matchResponse.status}`);
       }
-      
+
       const matchData = await matchResponse.json();
       setMatches(matchData);
-      
+
       // 顯示結果
       setShowResults(true);
       setShowForm(false);
@@ -185,13 +194,70 @@ export default function Home() {
         {/* Google 登入按鈕 */}
         <div style={{ position: "absolute", top: "10px", right: "10px" }}>
         {userInfo ? (
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <img
-              src={userInfo.picture}
-              alt="User Avatar"
-              style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-            />
-            <span>{userInfo.name}</span>
+          <div style={{ position: "relative" }}>
+            <div
+              style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
+              onClick={() => setShowDropdown(!showDropdown)}
+            >
+              <img
+                src={userInfo.picture}
+                alt="User Avatar"
+                style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+              />
+              <span>{userInfo.name}</span>
+            </div>
+            {showDropdown && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "50px",
+                  right: "0",
+                  backgroundColor: "white",
+                  border: "1px solid #ddd",
+                  borderRadius: "5px",
+                  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                  zIndex: 1000,
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setShowResults(true);
+                    setShowForm(false);
+                    setShowDropdown(false);
+                  }}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    padding: "10px",
+                    textAlign: "left",
+                    border: "none",
+                    backgroundColor: "transparent",
+                    cursor: "pointer",
+                  }}
+                >
+                  顯示我的配對結果
+                </button>
+                <button
+                  onClick={() => {
+                    setUserInfo(null);
+                    setCurrentTeacher(null);
+                    setShowDropdown(false);
+                    window.location.reload(); // Reload the page to reset Google Login
+                  }}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    padding: "10px",
+                    textAlign: "left",
+                    border: "none",
+                    backgroundColor: "transparent",
+                    cursor: "pointer",
+                  }}
+                >
+                  登出
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <GoogleLogin

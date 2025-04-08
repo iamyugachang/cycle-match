@@ -8,7 +8,7 @@ pub fn find_matches(teachers: Vec<Teacher>) -> Vec<MatchResult> {
     let teachers_by_year = group_teachers_by_year(&teachers);
     
     // 對每個年份進行配對
-    for (year, year_teachers) in teachers_by_year {
+    for (_year, year_teachers) in teachers_by_year {
         // 建立教師意願鄰接圖
         let preference_graph = build_preference_graph(&year_teachers);
         

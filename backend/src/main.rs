@@ -15,6 +15,8 @@ use sqlx::{postgres::PgPoolOptions, Pool, Postgres, Row};
 use tower_http::cors::{CorsLayer, Any};
 use std::net::SocketAddr;
 use model::{Teacher, MatchResult};
+use axum::extract::Query;
+use std::collections::HashMap;
 
 #[tokio::main]
 async fn main() {
@@ -132,13 +134,20 @@ async fn create_teacher(
 }
 
 async fn find_matches(
-    State(pool): State<Pool<Postgres>>
+    State(pool): State<Pool<Postgres>>,
+    Query(_params): Query<HashMap<String, String>>,
 ) -> Json<Vec<MatchResult>> {
-    let teachers = db::get_all_teachers(&pool)
-        .await
-        .unwrap_or_default();
-    
-    let matches = matcher::find_matches(teachers);
+    tracing::info!("收到配對結果請求");
+
+    let all_teachers = db::get_all_teachers(&pool).await.unwrap_or_default();
+
+    tracing::info!("教師數量: {}", all_teachers.len());
+
+    // 處理所有教師的配對邏輯
+    let matches = matcher::find_matches(all_teachers);
+
+    tracing::info!("配對結果數量: {}", matches.len());
+
     Json(matches)
 }
 
@@ -148,6 +157,7 @@ struct GoogleLoginRequest {
 }
 
 async fn google_login(
+    State(pool): State<Pool<Postgres>>,
     Json(payload): Json<GoogleLoginRequest>,
 ) -> Result<Json<Value>, (axum::http::StatusCode, String)> {
     let client_id = std::env::var("GOOGLE_CLIENT_ID").expect("GOOGLE_CLIENT_ID must be set");
@@ -158,13 +168,16 @@ async fn google_login(
         Ok(user_info) => {
             tracing::info!("Google 登入成功: {:?}", user_info);
 
-            // 返回使用者資訊
+            // 在驗證成功後，檢查是否有與 google_id 關聯的教師資料
+            let google_id = &user_info.email;
+            let teacher = db::get_teacher_by_google_id(&pool, google_id).await.ok();
+
             Ok(Json(serde_json::json!({
                 "email": user_info.email,
                 "google_id": user_info.email,
                 "name": user_info.name,
                 "picture": user_info.picture,
-                "teacher": null // 這裡可以返回教師資訊（如果需要）
+                "teacher": teacher // 返回教師資料（如果存在）
             })))
         }
         Err(err) => {

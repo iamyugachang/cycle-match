@@ -123,6 +123,51 @@ pub async fn create_teacher(pool: &Pool<Postgres>, teacher: Teacher) -> Result<T
     })
 }
 
+pub async fn get_teacher_by_google_id(
+    pool: &Pool<Postgres>,
+    google_id: &str,
+) -> Result<Teacher, sqlx::Error> {
+    // 使用 query 而非 query_as! 來避免編譯時需要連接資料庫
+    let row = sqlx::query(
+        r#"
+        SELECT 
+            id, 
+            name,
+            display_id,
+            email,
+            google_id,
+            year, 
+            current_county,
+            current_district,
+            current_school,
+            target_counties,
+            target_districts,
+            created_at
+        FROM teachers 
+        WHERE google_id = $1
+        "#
+    )
+    .bind(google_id)
+    .fetch_one(pool)
+    .await?;
+
+    // 手動將查詢結果轉換為 Teacher 結構
+    Ok(Teacher {
+        id: row.get("id"),
+        name: row.get("name"),
+        display_id: row.get("display_id"),
+        email: row.get("email"),
+        google_id: row.get("google_id"),
+        year: row.get("year"),
+        current_county: row.get("current_county"),
+        current_district: row.get("current_district"),
+        current_school: row.get("current_school"),
+        target_counties: row.get("target_counties"),
+        target_districts: row.get("target_districts"),
+        created_at: row.get("created_at"),
+    })
+}
+
 pub async fn init_db(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
     // 先刪除舊表（如果存在）
     sqlx::query("DROP TABLE IF EXISTS teachers")
