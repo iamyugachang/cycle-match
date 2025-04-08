@@ -164,7 +164,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
         Teacher {
             id: None,
             name: Some("測試教師1".to_string()),
-            display_id: Some("北大#01".to_string()),
+            display_id: Some("台北市大安區001".to_string()),
             email: format!("test1@example.com"),
             year: 114,
             current_county: "台北市".to_string(),
@@ -177,7 +177,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
         Teacher {
             id: None,
             name: Some("測試教師2".to_string()),
-            display_id: Some("北信#02".to_string()),
+            display_id: Some("台北市信義區002".to_string()),
             email: format!("test2@example.com"),
             year: 114,
             current_county: "台北市".to_string(),
@@ -187,15 +187,28 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             target_districts: vec!["大安區".to_string(), "西區".to_string()],
             created_at: None,
         },
+        Teacher {
+            id: None,
+            name: Some("測試教師3".to_string()),
+            display_id: Some("台北市中正區003".to_string()),
+            email: format!("test3@example.com"),
+            year: 114,
+            current_county: "台北市".to_string(),
+            current_district: "中正區".to_string(),
+            current_school: "中正國小".to_string(),
+            target_counties: vec!["新北市".to_string(), "台中市".to_string()],
+            target_districts: vec!["中和區".to_string(), "北區".to_string()],
+            created_at: None,
+        },
     ];
 
     // 測試數據：新北市教師
     let new_taipei_teachers = [
         Teacher {
             id: None,
-            name: Some("測試教師3".to_string()),
-            display_id: Some("新板#03".to_string()),
-            email: format!("test3@example.com"),
+            name: Some("測試教師4".to_string()),
+            display_id: Some("新北市板橋區004".to_string()),
+            email: format!("test4@example.com"),
             year: 114,
             current_county: "新北市".to_string(),
             current_district: "板橋區".to_string(),
@@ -204,15 +217,41 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             target_districts: vec!["大安區".to_string()],
             created_at: None,
         },
+        Teacher {
+            id: None,
+            name: Some("測試教師5".to_string()),
+            display_id: Some("新北市中和區005".to_string()),
+            email: format!("test5@example.com"),
+            year: 114,
+            current_county: "新北市".to_string(),
+            current_district: "中和區".to_string(),
+            current_school: "中和國小".to_string(),
+            target_counties: vec!["台北市".to_string(), "桃園市".to_string()],
+            target_districts: vec!["中正區".to_string(), "中壢區".to_string()],
+            created_at: None,
+        },
+        Teacher {
+            id: None,
+            name: Some("測試教師6".to_string()),
+            display_id: Some("新北市三重區006".to_string()),
+            email: format!("test6@example.com"),
+            year: 114,
+            current_county: "新北市".to_string(),
+            current_district: "三重區".to_string(),
+            current_school: "三重國小".to_string(),
+            target_counties: vec!["台北市".to_string(), "台中市".to_string()],
+            target_districts: vec!["信義區".to_string(), "西區".to_string()],
+            created_at: None,
+        },
     ];
 
     // 測試數據：台中市教師
     let taichung_teachers = [
         Teacher {
             id: None,
-            name: Some("測試教師4".to_string()),
-            display_id: Some("中西#04".to_string()),
-            email: format!("test4@example.com"),
+            name: Some("測試教師7".to_string()),
+            display_id: Some("台中市西區007".to_string()),
+            email: format!("test7@example.com"),
             year: 114,
             current_county: "台中市".to_string(),
             current_district: "西區".to_string(),
@@ -221,10 +260,58 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             target_districts: vec!["板橋區".to_string()],
             created_at: None,
         },
+        Teacher {
+            id: None,
+            name: Some("測試教師8".to_string()),
+            display_id: Some("台中市北區008".to_string()),
+            email: format!("test8@example.com"),
+            year: 114,
+            current_county: "台中市".to_string(),
+            current_district: "北區".to_string(),
+            current_school: "北區國小".to_string(),
+            target_counties: vec!["台北市".to_string(), "新北市".to_string()],
+            target_districts: vec!["大安區".to_string(), "三重區".to_string()],
+            created_at: None,
+        },
+    ];
+    
+    // 測試數據：桃園市教師
+    let taoyuan_teachers = [
+        Teacher {
+            id: None,
+            name: Some("測試教師9".to_string()),
+            display_id: Some("桃園市中壢區009".to_string()),
+            email: format!("test9@example.com"),
+            year: 114,
+            current_county: "桃園市".to_string(),
+            current_district: "中壢區".to_string(),
+            current_school: "中壢國小".to_string(),
+            target_counties: vec!["新北市".to_string(), "台北市".to_string()],
+            target_districts: vec!["中和區".to_string(), "大安區".to_string()],
+            created_at: None,
+        },
+        Teacher {
+            id: None,
+            name: Some("測試教師10".to_string()),
+            display_id: Some("桃園市桃園區010".to_string()),
+            email: format!("test10@example.com"),
+            year: 114,
+            current_county: "桃園市".to_string(),
+            current_district: "桃園區".to_string(),
+            current_school: "桃園國小".to_string(),
+            target_counties: vec!["台中市".to_string(), "新北市".to_string()],
+            target_districts: vec!["西區".to_string(), "板橋區".to_string()],
+            created_at: None,
+        },
     ];
 
     // 合併所有測試數據
-    let test_teachers = [&taipei_teachers[..], &new_taipei_teachers[..], &taichung_teachers[..]].concat();
+    let test_teachers = [
+        &taipei_teachers[..], 
+        &new_taipei_teachers[..], 
+        &taichung_teachers[..],
+        &taoyuan_teachers[..]
+    ].concat();
 
     // 將測試數據插入數據庫
     for teacher in test_teachers {

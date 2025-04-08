@@ -375,7 +375,7 @@ export default function Home() {
                 width: "100%"
               }}>
                 <h3 style={{ marginTop: 0 }}>教師聯絡資訊</h3>
-                <p><strong>ID:</strong> {teacherInfo.id}</p>
+                <p><strong>代號:</strong> {teacherInfo.id ? `${matches.flatMap(m => m.teachers).find(t => t.id === teacherInfo.id)?.display_id || '未知'}` : '未知'}</p>
                 <p><strong>Email:</strong> {teacherInfo.email}</p>
                 <button 
                   onClick={closeTeacherInfo}
