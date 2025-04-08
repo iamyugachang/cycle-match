@@ -6,9 +6,13 @@ use uuid::Uuid;
 
 // 用於生成顯示ID的函數
 pub fn generate_display_id(county: &str, district: &str) -> String {
-    let mut rng = thread_rng();
-    let random_num: u16 = rng.gen_range(10..100);
-    format!("{}{}#{}", county.chars().next().unwrap_or('未'), district.chars().next().unwrap_or('知'), random_num)
+    // 取得當前時間戳作為唯一性保證
+    let timestamp = Utc::now().timestamp_millis();
+    // 生成一個短雜湊
+    let hash = timestamp % 1000;
+    
+    // 組合成格式：縣市+區域+時間戳尾碼
+    format!("{}{}{:03}", county, district, hash)
 }
 
 pub async fn get_all_teachers(pool: &Pool<Postgres>) -> Result<Vec<Teacher>, sqlx::Error> {
