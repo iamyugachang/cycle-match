@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import TeacherForm from "../components/TeacherForm";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 interface Teacher {
   id?: number;
@@ -29,7 +30,45 @@ export default function Home() {
   const [showResults, setShowResults] = useState(false);
   const [showForm, setShowForm] = useState(true);
   const [teacherInfo, setTeacherInfo] = useState<{id: number | undefined, email: string} | null>(null);
+  const [userInfo, setUserInfo] = useState<{ name: string; picture: string } | null>(null);
 
+  const handleGoogleLoginSuccess = (credentialResponse: any) => {
+    console.log("Google 登入成功:", credentialResponse);
+    const token = credentialResponse.credential;
+  
+    // 將 Google Token 傳送到後端進行驗證
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/google-login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("後端驗證成功:", data);
+  
+        // 設定使用者資訊
+        setUserInfo({
+          name: data.name || "未知使用者",
+          picture: data.picture || "",
+        });
+  
+        // 根據需要處理登入後的邏輯，例如設定當前使用者
+        setCurrentTeacher(data.teacher);
+      })
+      .catch((err) => {
+        console.error("後端驗證失敗:", err);
+        setError("Google 登入驗證失敗，請稍後再試");
+      });
+  };
+
+  // Google 登入失敗處理
+  const handleGoogleLoginFailure = (error: any) => {
+    console.error("Google 登入失敗:", error);
+    setError("Google 登入失敗，請稍後再試");
+  };
+  
   // 獲取教師數據和配對結果的函數
   const fetchData = async () => {
     setLoading(true);
@@ -127,9 +166,29 @@ export default function Home() {
   };
 
   return (
-    <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>CircleMatch - 教師介聘配對系統</h1>
-      
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+      <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+        <h1 style={{ textAlign: "center", marginBottom: "20px" }}>CircleMatch - 教師介聘配對系統</h1>
+
+        {/* Google 登入按鈕 */}
+        <div style={{ position: "absolute", top: "10px", right: "10px" }}>
+        {userInfo ? (
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <img
+              src={userInfo.picture}
+              alt="User Avatar"
+              style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+            />
+            <span>{userInfo.name}</span>
+          </div>
+        ) : (
+          <GoogleLogin
+            onSuccess={handleGoogleLoginSuccess}
+            onError={handleGoogleLoginFailure}
+          />
+        )}
+      </div>
+
       {!showResults && showForm ? (
         <div style={{ 
           padding: "20px", 
@@ -397,6 +456,7 @@ export default function Home() {
         </div>
       )}
     </main>
+    </GoogleOAuthProvider>
   );
   
   // 按照當前使用者參與的配對優先排序

@@ -18,6 +18,8 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgres://app:password@db:5432/circlematch
+      GOOGLE_CLIENT_ID: "1094992986255-n19onlta1qmm7h2q34r4u1iugiqkrk0c.apps.googleusercontent.com"
+      GOOGLE_CLIENT_SECRET: "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"
     depends_on:
       - db
 
@@ -27,6 +29,7 @@ services:
       - "3000:3000"
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: "1094992986255-n19onlta1qmm7h2q34r4u1iugiqkrk0c.apps.googleusercontent.com"
     depends_on:
       - backend
 

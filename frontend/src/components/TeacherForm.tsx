@@ -17,6 +17,7 @@ interface Teacher {
 
 interface TeacherFormProps {
   onSubmit: (teacher: Teacher) => void;
+  defaultEmail?: string;
 }
 
 export default function TeacherForm({ onSubmit }: TeacherFormProps) {

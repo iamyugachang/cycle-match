@@ -4,10 +4,14 @@ mod matcher;
 
 use axum::{
     routing::{get, post},
-    Router, Json, extract::State,
-    http::Method,
+    Router, extract::State,
+    http::Method, extract::Json,
+    http::StatusCode,
 };
 use serde::Serialize;
+use serde::Deserialize;
+use reqwest::Client;
+use serde_json::Value;
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres, Row};
 use tower_http::cors::{CorsLayer, Any};
 use std::net::SocketAddr;
@@ -40,6 +44,7 @@ async fn main() {
         .route("/api/teachers", get(get_teachers))
         .route("/api/teachers", post(create_teacher))
         .route("/api/matches", get(find_matches))
+        .route("/api/google-login", post(google_login))
         .with_state(pool)
         .layer(cors);
 
@@ -122,4 +127,72 @@ async fn find_matches(
     
     let matches = matcher::find_matches(teachers);
     Json(matches)
+}
+
+#[derive(Deserialize)]
+struct GoogleLoginRequest {
+    token: String,
+}
+
+async fn google_login(
+    Json(payload): Json<GoogleLoginRequest>,
+) -> Result<Json<Value>, (axum::http::StatusCode, String)> {
+    let client_id = std::env::var("GOOGLE_CLIENT_ID").expect("GOOGLE_CLIENT_ID must be set");
+    let client_secret = std::env::var("GOOGLE_CLIENT_SECRET").expect("GOOGLE_CLIENT_SECRET must be set");
+
+    // 驗證 Google Token
+    match verify_google_token(&payload.token, &client_id, &client_secret).await {
+        Ok(user_info) => {
+            tracing::info!("Google 登入成功: {:?}", user_info);
+
+            // 返回使用者資訊
+            Ok(Json(serde_json::json!({
+                "email": user_info.email,
+                "name": user_info.name,
+                "picture": user_info.picture,
+                "teacher": null // 這裡可以返回教師資訊（如果需要）
+            })))
+        }
+        Err(err) => {
+            tracing::error!("Google 登入失敗: {}", err);
+            Err((axum::http::StatusCode::UNAUTHORIZED, "驗證失敗".to_string()))
+        }
+    }
+}
+
+async fn verify_google_token(token: &str, client_id: &str, _client_secret: &str) -> Result<GoogleTokenInfo, String> {
+    let client = Client::new();
+    let google_api_url = format!(
+        "https://oauth2.googleapis.com/tokeninfo?id_token={}",
+        token
+    );
+
+    let response = client.get(&google_api_url).send().await.map_err(|err| {
+        format!("無法連接到 Google API: {}", err)
+    })?;
+
+    if !response.status().is_success() {
+        return Err("Google Token 驗證失敗".to_string());
+    }
+
+    let token_info: Value = response.json().await.map_err(|err| {
+        format!("解析 Google 回應失敗: {}", err)
+    })?;
+
+    if token_info["aud"].as_str() != Some(client_id) {
+        return Err("Token 的 audience 不匹配".to_string());
+    }
+
+    Ok(GoogleTokenInfo {
+        email: token_info["email"].as_str().unwrap_or("未知使用者").to_string(),
+        name: token_info["name"].as_str().unwrap_or("未知使用者").to_string(),
+        picture: token_info["picture"].as_str().unwrap_or("").to_string(),
+    })
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct GoogleTokenInfo {
+    email: String,
+    name: String,
+    picture: String,
 }
