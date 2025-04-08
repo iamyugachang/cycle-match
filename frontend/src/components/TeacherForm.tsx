@@ -64,6 +64,23 @@ export default function TeacherForm({ onSubmit, defaultEmail }: TeacherFormProps
     });
   };
 
+  const removeTargetLocation = (index: number) => {
+    // 不允許刪除最後一個志願
+    if (teacher.target_counties.length <= 1) return;
+    
+    const newCounties = [...teacher.target_counties];
+    const newDistricts = [...teacher.target_districts];
+    
+    newCounties.splice(index, 1);
+    newDistricts.splice(index, 1);
+    
+    setTeacher({
+      ...teacher,
+      target_counties: newCounties,
+      target_districts: newDistricts
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(teacher);
@@ -143,15 +160,15 @@ export default function TeacherForm({ onSubmit, defaultEmail }: TeacherFormProps
       <div style={{ marginBottom: '10px' }}>
         <label style={{ display: 'block' }}>希望調往地區:</label>
         {teacher.target_counties.map((county, index) => (
-          <div key={index} style={{ display: 'flex', marginBottom: '5px' }}>
-            <span>{index + 1}.</span>
+          <div key={index} style={{ display: 'flex', marginBottom: '5px', alignItems: 'center' }}>
+            <span style={{ width: '20px', textAlign: 'right', marginRight: '5px' }}>{index + 1}.</span>
             <input
               type="text"
               placeholder="縣/市"
               value={county}
               onChange={(e) => handleTargetChange(index, 'county', e.target.value)}
               required
-              style={{ flex: 1, marginLeft: '5px', padding: '5px' }}
+              style={{ flex: 1, padding: '5px' }}
             />
             <input
               type="text"
@@ -161,6 +178,24 @@ export default function TeacherForm({ onSubmit, defaultEmail }: TeacherFormProps
               required
               style={{ flex: 1, marginLeft: '5px', padding: '5px' }}
             />
+            {teacher.target_counties.length > 1 && (
+              <button 
+                type="button"
+                onClick={() => removeTargetLocation(index)}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginLeft: '5px',
+                  padding: '0 5px',
+                  fontSize: '16px',
+                  color: '#dc3545'
+                }}
+                title="刪除此志願"
+              >
+                🗑️
+              </button>
+            )}
           </div>
         ))}
         <button 
