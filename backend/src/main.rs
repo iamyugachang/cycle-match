@@ -80,15 +80,25 @@ struct Message {
 }
 
 async fn get_teachers(
-    State(pool): State<Pool<Postgres>>
+    State(pool): State<Pool<Postgres>>,
+    Query(params): Query<HashMap<String, String>>,
 ) -> Json<Vec<Teacher>> {
+    // 檢查是否有 google_id 參數
+    if let Some(google_id) = params.get("google_id") {
+        // 根據 google_id 查詢
+        if let Ok(teacher) = db::get_teacher_by_google_id(&pool, google_id).await {
+            return Json(vec![teacher]);
+        }
+        return Json(vec![]);
+    }
+
+    // 無 google_id 參數時獲取所有教師
     let teachers = db::get_all_teachers(&pool)
         .await
         .unwrap_or_default();
     
     Json(teachers)
 }
-
 
 async fn create_teacher(
     State(pool): State<Pool<Postgres>>,
