@@ -1,20 +1,20 @@
 import { MatchResult, Teacher } from "../types";
 
 /**
- * Get the display name for a match based on number of teachers
+ * 根據配對結果返回配對類型名稱
  */
-export const getMatchTypeName = (match?: { teachers?: any[] }) => {
-  if (!match?.teachers) return "未配對";
+export function getMatchTypeName(match: MatchResult): string {
+  // 不再區分配對類型，統一顯示為 N 角調
   return `${match.teachers.length} 角調`;
-};
+}
 
 /**
- * Check if a teacher is involved in a match
+ * 判斷當前用戶是否參與該配對
  */
-export const isUserInvolved = (match: MatchResult, teacher: Teacher | null) => {
-  if (!teacher) return false;
-  return match.teachers.some(t => t.id === teacher.id);
-};
+export function isUserInvolved(match: MatchResult, currentTeacher: Teacher | null): boolean {
+  if (!currentTeacher) return false;
+  return match.teachers.some(teacher => teacher.id === currentTeacher.id);
+}
 
 /**
  * Sort matches with user's matches first, then by match type
@@ -28,9 +28,8 @@ export const sortMatches = (matches: MatchResult[], currentTeacher: Teacher | nu
     if (aInvolved && !bInvolved) return -1;
     if (!aInvolved && bInvolved) return 1;
     
-    // Then sort by match type (direct -> triangle -> cycle)
-    const typeOrder = { direct: 1, triangle: 2, cycle: 3 };
-    return (typeOrder[a.match_type] || 99) - (typeOrder[b.match_type] || 99);
+    // Then sort by number of teachers (smaller cycles first)
+    return a.teachers.length - b.teachers.length;
   });
 };
 

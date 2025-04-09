@@ -5,15 +5,16 @@ import { getMatchTypeName, isUserInvolved } from "../utils/matchUtils";
 interface MatchCardProps {
   match: MatchResult;
   currentTeacher: Teacher | null;
+  showDetailedView?: boolean; // 新增參數，用於控制是否顯示詳細視圖
 }
 
-const MatchCard: React.FC<MatchCardProps> = ({ match, currentTeacher }) => {
+const MatchCard: React.FC<MatchCardProps> = ({ 
+  match, 
+  currentTeacher, 
+  showDetailedView = false 
+}) => {
   const isInvolved = isUserInvolved(match, currentTeacher);
   
-  // Debug log to check match structure
-  console.log("Match in MatchCard:", match);
-  console.log("Teachers array:", match?.teachers);
-
   return (
     <div
       className={`rounded-lg border p-4 mb-4 ${
@@ -25,6 +26,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, currentTeacher }) => {
           <div className="font-bold">
             {getMatchTypeName(match)}
           </div>
+          {isInvolved && <div className="text-sm text-blue-600 mt-1">您參與的配對</div>}
         </div>
         
         <div className="basis-2/3">
@@ -43,6 +45,12 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, currentTeacher }) => {
               </div>
             ))}
           </div>
+          
+          {showDetailedView && (
+            <div className="text-xs text-gray-500 mt-2 text-right">
+              {match.createdAt && `建立於: ${new Date(match.createdAt).toLocaleString()}`}
+            </div>
+          )}
         </div>
       </div>
     </div>
