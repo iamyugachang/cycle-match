@@ -470,12 +470,92 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
         },
     ];
 
+    // 測試數據：其他教師（滿足 5 角調，跨縣市）
+    let additional_teachers = [
+        Teacher {
+            id: None,
+            name: Some("測試教師11".to_string()),
+            display_id: Some("臺北市士林區#011".to_string()),
+            email: format!("test11@example.com"),
+            google_id: None,
+            year: 114,
+            subject: "一般".to_string(),
+            current_county: "臺北市".to_string(),
+            current_district: "士林區".to_string(),
+            current_school: "士林國小".to_string(),
+            target_counties: vec!["新北市".to_string()],
+            target_districts: vec!["永和區".to_string()], // 指向測試教師12
+            created_at: None,
+        },
+        Teacher {
+            id: None,
+            name: Some("測試教師12".to_string()),
+            display_id: Some("新北市永和區#012".to_string()),
+            email: format!("test12@example.com"),
+            google_id: None,
+            year: 114,
+            subject: "一般".to_string(),
+            current_county: "新北市".to_string(),
+            current_district: "永和區".to_string(),
+            current_school: "永和國小".to_string(),
+            target_counties: vec!["桃園市".to_string()],
+            target_districts: vec!["平鎮區".to_string()], // 指向測試教師13
+            created_at: None,
+        },
+        Teacher {
+            id: None,
+            name: Some("測試教師13".to_string()),
+            display_id: Some("桃園市平鎮區#013".to_string()),
+            email: format!("test13@example.com"),
+            google_id: None,
+            year: 114,
+            subject: "一般".to_string(),
+            current_county: "桃園市".to_string(),
+            current_district: "平鎮區".to_string(),
+            current_school: "平鎮國小".to_string(),
+            target_counties: vec!["臺中市".to_string()],
+            target_districts: vec!["南屯區".to_string()], // 指向測試教師14
+            created_at: None,
+        },
+        Teacher {
+            id: None,
+            name: Some("測試教師14".to_string()),
+            display_id: Some("臺中市南屯區#014".to_string()),
+            email: format!("test14@example.com"),
+            google_id: None,
+            year: 114,
+            subject: "一般".to_string(),
+            current_county: "臺中市".to_string(),
+            current_district: "南屯區".to_string(),
+            current_school: "南屯國小".to_string(),
+            target_counties: vec!["高雄市".to_string()],
+            target_districts: vec!["三民區".to_string()], // 指向測試教師15
+            created_at: None,
+        },
+        Teacher {
+            id: None,
+            name: Some("測試教師15".to_string()),
+            display_id: Some("高雄市三民區#015".to_string()),
+            email: format!("test15@example.com"),
+            google_id: None,
+            year: 114,
+            subject: "一般".to_string(),
+            current_county: "高雄市".to_string(),
+            current_district: "三民區".to_string(),
+            current_school: "三民國小".to_string(),
+            target_counties: vec!["臺北市".to_string()],
+            target_districts: vec!["士林區".to_string()], // 指向測試教師11，形成5角調
+            created_at: None,
+        },
+    ];
+
     // 合併所有測試數據
     let test_teachers = [
         &taipei_teachers[..], 
         &new_taipei_teachers[..], 
         &taichung_teachers[..],
-        &taoyuan_teachers[..]
+        &taoyuan_teachers[..],
+        &additional_teachers[..]
     ].concat();
 
     // 將測試數據插入數據庫

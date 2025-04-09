@@ -82,7 +82,12 @@ fn build_preference_graph(teachers: &[Teacher]) -> HashMap<usize, Vec<usize>> {
 
 // 檢查教師是否希望調往特定縣市和區域
 fn wants_location(from_teacher: &Teacher, to_teacher: &Teacher) -> bool {
-    // 檢查縣市與區域是否符合
+    // 檢查縣市是否相同，相同縣市不允許匹配
+    if from_teacher.current_county == to_teacher.current_county {
+        return false;
+    }
+    
+    // 檢查縣市與區域是否符合教師的調動志願
     for (i, county) in from_teacher.target_counties.iter().enumerate() {
         if county == &to_teacher.current_county && 
            i < from_teacher.target_districts.len() && 

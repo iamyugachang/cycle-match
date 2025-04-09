@@ -100,6 +100,12 @@ npm run dev
 - `GET /api/teachers` - Get list of teachers (optional `google_id` parameter)
 - `GET /api/matches` - Find potential matches
 
+## To-Do
+- [ ] Enable edition on submitted forms
+- [ ] Create production and testing DB
+- [ ] Test with Supabase
+- [ ] Go production
+
 ## License
 
 MIT

@@ -156,7 +156,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
           <tr style={{ backgroundColor: highlighted ? "#e6f2ff" : "#f5f5f5" }}>
             <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>教師</th>
             <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>現任學校</th>
-            <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>調往學校</th>
+            <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>目標調往區域</th>
             <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>任教科目</th>
             <th style={{ padding: "8px", textAlign: "center", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6", width: "40px" }}>資訊</th>
           </tr>
@@ -187,7 +187,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                   padding: "8px", 
                   border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" 
                 }}>
-                  {nextTeacher.current_county} • {nextTeacher.current_district} • {nextTeacher.current_school}
+                  {nextTeacher.current_county} • {nextTeacher.current_district}
                 </td>
                 <td style={{ 
                   padding: "8px", 
