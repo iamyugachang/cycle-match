@@ -3,6 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:15
+    container_name: circlematch-db
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: password
@@ -11,9 +12,18 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    image: circlematch-backend:latest
+    container_name: circlematch-backend
     ports:
       - "8000:8000"
     environment:
@@ -24,7 +34,11 @@ services:
       - db
 
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: circlematch-frontend:latest
+    container_name: circlematch-frontend
     ports:
       - "3000:3000"
     environment:
