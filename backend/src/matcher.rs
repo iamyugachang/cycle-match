@@ -7,14 +7,19 @@ pub fn find_matches(teachers: Vec<Teacher>) -> Vec<MatchResult> {
     // 按年份分組
     let teachers_by_year = group_teachers_by_year(&teachers);
     
-    // 對每個年份進行配對
-    for (year, year_teachers) in teachers_by_year {
-        // 建立教師意願鄰接圖
-        let preference_graph = build_preference_graph(&year_teachers);
+    // 進一步按科目分組
+    for (_year, year_teachers) in teachers_by_year {
+        let teachers_by_subject = group_teachers_by_subject(&year_teachers);
         
-        // 尋找循環圖 (從2人到10人)
-        for cycle_size in 2..=10 {
-            find_cycles(&year_teachers, &preference_graph, cycle_size, &mut results);
+        // 對每個科目組進行配對
+        for (_subject, subject_teachers) in teachers_by_subject {
+            // 建立教師意願鄰接圖
+            let preference_graph = build_preference_graph(&subject_teachers);
+            
+            // 尋找循環圖 (從2人到10人)
+            for cycle_size in 2..=10 {
+                find_cycles(&subject_teachers, &preference_graph, cycle_size, &mut results);
+            }
         }
     }
     
@@ -31,6 +36,26 @@ fn group_teachers_by_year(teachers: &[Teacher]) -> HashMap<i32, Vec<Teacher>> {
         groups.entry(teacher.year)
             .or_insert_with(Vec::new)
             .push(teacher.clone());
+    }
+    groups
+}
+
+// 將教師按科目分組
+fn group_teachers_by_subject(teachers: &[Teacher]) -> HashMap<String, Vec<Teacher>> {
+    let mut groups = HashMap::new();
+    for teacher in teachers {
+        // 使用小寫並去除空白，增加匹配機會
+        let normalized_subject = teacher.subject.to_lowercase().trim().to_string();
+        if !normalized_subject.is_empty() {
+            groups.entry(normalized_subject)
+                .or_insert_with(Vec::new)
+                .push(teacher.clone());
+        } else {
+            // 對於沒有填寫科目的教師，使用特殊標識
+            groups.entry("未指定".to_string())
+                .or_insert_with(Vec::new)
+                .push(teacher.clone());
+        }
     }
     groups
 }

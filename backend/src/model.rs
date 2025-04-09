@@ -9,6 +9,7 @@ pub struct Teacher {
     pub email: String,
     pub google_id: Option<String>,
     pub year: i32,
+    pub subject: String,  // Added subject field
     pub current_county: String,
     pub current_district: String,
     pub current_school: String,

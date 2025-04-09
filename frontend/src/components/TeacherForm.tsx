@@ -121,7 +121,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
           }}
           required
         />
-      </div>
+              </div>
 
       <h3 style={{ marginBottom: "15px" }}>現職學校</h3>
       <div style={{ display: "flex", gap: "25px", marginBottom: "20px" }}>

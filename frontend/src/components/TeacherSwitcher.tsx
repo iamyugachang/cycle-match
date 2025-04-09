@@ -52,7 +52,7 @@ const TeacherSwitcher: React.FC<TeacherSwitcherProps> = ({
               transition: "all 0.2s"
             }}
           >
-            {teacher.current_county} {teacher.current_district} {teacher.current_school}
+            {teacher.current_county} • {teacher.current_district} • {teacher.current_school} • {teacher.subject || '未指定科目'}
           </button>
         ))}
       </div>
