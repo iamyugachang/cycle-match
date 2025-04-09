@@ -22,9 +22,24 @@ static TAIWAN_DISTRICTS: Lazy<Arc<Value>> = Lazy::new(|| {
     ])))
 });
 
+// 科目資料快取
+static ELEMENTARY_SUBJECTS: Lazy<Arc<Vec<String>>> = Lazy::new(|| {
+    let json_data = include_str!("../data/taiwan_elementary_subject.json");
+    Arc::new(serde_json::from_str(json_data).unwrap_or_else(|_| vec![
+        "一般".to_string(),
+        "英文".to_string(),
+        "體育".to_string()
+    ]))
+});
+
 // 取得縣市區域資料
 pub fn get_taiwan_districts() -> Arc<Value> {
     TAIWAN_DISTRICTS.clone()
+}
+
+// 取得國小教師科目資料
+pub fn get_elementary_subjects() -> Arc<Vec<String>> {
+    ELEMENTARY_SUBJECTS.clone()
 }
 
 // 用於生成顯示ID的函數

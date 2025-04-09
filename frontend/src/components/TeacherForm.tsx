@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { Teacher } from "../types";
 import LocationSelector from "./LocationSelector";
+import { fetchSubjects } from "../utils/subjectUtils";
 
 interface TeacherFormProps {
   onSubmit: (teacher: Teacher) => void;
@@ -29,6 +30,24 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
 
   // Change this to only show validation errors after submission attempt
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
+
+  useEffect(() => {
+    const loadSubjects = async () => {
+      setLoadingSubjects(true);
+      try {
+        const subjectList = await fetchSubjects();
+        setSubjects(subjectList);
+      } catch (error) {
+        console.error("Failed to fetch subjects:", error);
+      } finally {
+        setLoadingSubjects(false);
+      }
+    };
+    loadSubjects();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -308,16 +327,25 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
               minWidth: "200px" // Same as locationColumn
             }}>
               <label htmlFor="subject" style={formStyles.label}>任教科目</label>
-              <input
-                type="text"
+              <select
                 id="subject"
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
-                placeholder="例如：一般、數學、美術"
                 style={formStyles.input}
                 required
-              />
+                disabled={loadingSubjects}
+              >
+                <option value="">請選擇科目</option>
+                {subjects.map((subject) => (
+                  <option key={subject} value={subject}>
+                    {subject}
+                  </option>
+                ))}
+              </select>
+              {loadingSubjects && (
+                <small style={formStyles.helpText}>載入中...</small>
+              )}
             </div>
           </div>
         </div>

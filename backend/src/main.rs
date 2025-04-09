@@ -48,6 +48,7 @@ async fn main() {
         .route("/api/matches", get(find_matches))
         .route("/api/google-login", post(google_login))
         .route("/api/districts", get(get_districts))
+        .route("/api/subjects", get(get_subjects)) // Add this new route
         .with_state(pool)
         .layer(cors);
 
@@ -259,4 +260,10 @@ struct GoogleTokenInfo {
     email: String,
     name: String,
     picture: String,
+}
+
+// 返回科目資料
+async fn get_subjects() -> impl IntoResponse {
+    let subjects = db::get_elementary_subjects();
+    Json(subjects)
 }
