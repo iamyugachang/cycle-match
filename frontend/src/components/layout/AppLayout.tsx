@@ -41,7 +41,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       )}
 
       <h1 style={{ textAlign: "center", marginBottom: "20px", marginTop: "40px" }}>
-        CircleMatch - {currentYear}年度教師介聘配對系統
+        CircleMatch - 台灣 {currentYear} 年度小學教師介聘配對系統
       </h1>
 
       {children}

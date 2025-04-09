@@ -24,7 +24,7 @@ const TeacherFormContainer: React.FC<TeacherFormContainerProps> = ({
       borderRadius: "5px" 
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
-        <h2 style={{ margin: 0 }}>登記{currentYear}年度介聘資料</h2>
+        <h2 style={{ margin: 0 }}>登記 {currentYear} 年度介聘資料</h2>
       </div>
       
       <TeacherForm onSubmit={onSubmit} defaultEmail={defaultEmail} />

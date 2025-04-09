@@ -151,15 +151,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
     console.log("Current form data county:", formData.current_county);
   }, [formData.current_county]);
 
-  // A separate component that renders the selected county
-  // This ensures we're always looking at the latest state
-  const SelectedCountyDisplay = ({ county, district }: { county: string, district: string }) => (
-    <small style={{ color: "gray", marginTop: "5px", display: "block" }}>
-      目前選擇: {county ? `「${county}」` : "未選擇縣市"} 
-      {district ? `/ ${district}` : ''}
-    </small>
-  );
-
   // Define styles for reuse
   const formStyles = {
     container: { 
@@ -285,8 +276,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
             </p>
           )}
           
-          <SelectedCountyDisplay county={formData.current_county} district={formData.current_district} />
-          
           <input 
             type="hidden" 
             name="current_county" 
@@ -353,6 +342,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
 
       {/* Row 4: Target School Section Header */}
       <h3 style={formStyles.section}>希望調往地區</h3>
+      <small style={formStyles.helpText}>請排志願序，演算法將依照此排序配對</small>
       
       {/* Row 5: Various Transfer Options - Fixed to properly show county options */}
       {formData.target_counties.map((county, index) => (
@@ -415,7 +405,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
               style={formStyles.input}
               required
             />
-            <small style={formStyles.helpText}>用於教師間聯絡</small>
+            <small style={formStyles.helpText}>僅供教師間聯絡，本站不會做任何用途</small>
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({ onSuccess, onError }) => 
       margin: "0 auto 30px",
       backgroundColor: "#fff"
     }}>
-      <h2 style={{ marginBottom: "20px", color: "#2c3e50" }}>歡迎使用 {currentYear}年度教師介聘配對系統</h2>
+      <h2 style={{ marginBottom: "20px", color: "#2c3e50" }}>歡迎使用台灣 {currentYear} 年度小學教師介聘配對系統</h2>
       
       <p style={{ fontSize: "16px", lineHeight: "1.6", marginBottom: "15px" }}>
         Circle Match 是一個幫助教師找到互調機會的平台。透過多角調配對演算法，
