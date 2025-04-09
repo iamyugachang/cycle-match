@@ -147,7 +147,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
         </div>
         <div style={{ flex: 1 }}>
           <label htmlFor="current_district" style={{ display: "block", marginBottom: "5px" }}>
-            區
+            區域
           </label>
           <input
             type="text"
@@ -212,7 +212,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
             </div>
             <div style={{ flex: 1 }}>
               <label style={{ display: "block", marginBottom: "5px" }}>
-                區 {index + 1}
+                區域 {index + 1}
               </label>
               <input
                 type="text"
