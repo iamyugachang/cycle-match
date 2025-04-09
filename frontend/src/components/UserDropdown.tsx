@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { UserInfo } from "../types";
 
 interface UserDropdownProps {
@@ -15,17 +15,32 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const handleMouseEnter = () => {
+    // Clear any existing timeout to prevent the dropdown from closing
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     setShowDropdown(true);
   };
 
   const handleMouseLeave = () => {
-    // Small delay to prevent immediate closing
-    setTimeout(() => {
+    // Set a longer timeout (500ms) to give user time to move to the dropdown
+    timeoutRef.current = setTimeout(() => {
       setShowDropdown(false);
-    }, 100);
+    }, 150);
   };
+
+  // Add effect to clean up timeout when component unmounts
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div 
@@ -95,6 +110,8 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       {showDropdown && (
         <div
           ref={dropdownRef}
+          onMouseEnter={handleMouseEnter} // Also prevent closing when hovering the dropdown
+          onMouseLeave={handleMouseLeave}
           style={{
             position: "absolute",
             top: "100%",
@@ -104,7 +121,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
             borderRadius: "4px",
             boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
             width: "150px",
-            marginTop: "2px" // Reduce the gap to make it easier to hover
+            marginTop: "2px" // Small gap between button and dropdown
           }}
         >
           <div style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
