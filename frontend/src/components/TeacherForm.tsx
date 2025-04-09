@@ -77,7 +77,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{ maxWidth: "calc(100% - 20px)", margin: "0 auto" }}>
       <div style={{ marginBottom: "20px" }}>
         <label htmlFor="email" style={{ display: "block", marginBottom: "5px" }}>
           電子郵件
@@ -124,7 +124,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
       </div>
 
       <h3 style={{ marginBottom: "15px" }}>現職學校</h3>
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+      <div style={{ display: "flex", gap: "25px", marginBottom: "20px" }}>
         <div style={{ flex: 1 }}>
           <label htmlFor="current_county" style={{ display: "block", marginBottom: "5px" }}>
             縣市
@@ -190,8 +190,12 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
 
       <h3 style={{ marginBottom: "15px" }}>希望調往地區</h3>
       {formData.target_counties.map((county, index) => (
-        <div key={index} style={{ marginBottom: "15px" }}>
-          <div style={{ display: "flex", gap: "10px", alignItems: "flex-end" }}>
+        <div 
+          key={index} 
+          style={{ marginBottom: "15px", position: "relative" }}
+          className={index > 0 ? "target-row additional-row" : "target-row"}
+        >
+          <div style={{ display: "flex", gap: "25px" }}>
             <div style={{ flex: 1 }}>
               <label style={{ display: "block", marginBottom: "5px" }}>
                 縣市 {index + 1}
@@ -228,23 +232,54 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
                 required
               />
             </div>
-            {index > 0 && (
-              <button
-                type="button"
-                onClick={() => removeTarget(index)}
-                style={{
-                  padding: "8px 12px",
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer"
-                }}
-              >
-                移除
-              </button>
-            )}
           </div>
+          {index > 0 && (
+            <button
+              type="button"
+              onClick={() => removeTarget(index)}
+              style={{
+                padding: "8px 12px",
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                position: "absolute",
+                right: "-5px",
+                bottom: "0",
+                opacity: 0,
+                pointerEvents: "none",
+                zIndex: 10,
+              }}
+              className="remove-button"
+            >
+              移除
+            </button>
+          )}
+          <style jsx>{`
+            .additional-row {
+              padding-right: 0;
+              transition: padding-right 0.3s ease;
+            }
+            .additional-row:hover {
+              padding-right: 70px;
+            }
+            .additional-row:hover .remove-button {
+              opacity: 1;
+              pointer-events: auto !important;
+              animation: fadeIn 0.3s ease forwards;
+            }
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+                transform: translateX(-10px);
+              }
+              to {
+                opacity: 1;
+                transform: translateX(0);
+              }
+            }
+          `}</style>
         </div>
       ))}
 
