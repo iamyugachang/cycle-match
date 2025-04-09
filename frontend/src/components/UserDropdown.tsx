@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { UserInfo } from "../types";
 
 interface UserDropdownProps {
@@ -13,21 +13,34 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   onLogout 
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const handleMouseEnter = () => {
+    setShowDropdown(true);
+  };
 
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
+  const handleMouseLeave = () => {
+    // Small delay to prevent immediate closing
+    setTimeout(() => {
+      setShowDropdown(false);
+    }, 100);
   };
 
   return (
-    <div style={{ 
-      position: "absolute", 
-      top: "10px", 
-      right: "10px",
-      zIndex: 100
-    }}>
+    <div 
+      ref={containerRef}
+      style={{ 
+        position: "absolute", 
+        top: "10px", 
+        right: "10px",
+        zIndex: 100
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* User avatar/button */}
       <button
-        onClick={toggleDropdown}
         style={{
           display: "flex",
           alignItems: "center",
@@ -35,7 +48,9 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
           background: "white",
           border: "1px solid #ddd",
           borderRadius: "20px",
-          cursor: "pointer"
+          cursor: "pointer",
+          minWidth: "150px",  // Fixed width to prevent layout shifts
+          justifyContent: "flex-start"
         }}
       >
         {userInfo.picture ? (
@@ -67,26 +82,34 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
             {userInfo.name.charAt(0).toUpperCase()}
           </div>
         )}
-        {userInfo.name}
+        <span style={{ 
+          overflow: "hidden", 
+          textOverflow: "ellipsis", 
+          whiteSpace: "nowrap" 
+        }}>
+          {userInfo.name}
+        </span>
       </button>
 
       {/* Dropdown menu */}
       {showDropdown && (
         <div
+          ref={dropdownRef}
           style={{
             position: "absolute",
-            top: "40px",
+            top: "100%",
             right: "0",
             backgroundColor: "white",
             border: "1px solid #ddd",
             borderRadius: "4px",
             boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-            width: "150px"
+            width: "150px",
+            marginTop: "2px" // Reduce the gap to make it easier to hover
           }}
         >
           <div style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
-            <div style={{ fontWeight: "bold" }}>{userInfo.name}</div>
-            <div style={{ fontSize: "12px", color: "#666" }}>{userInfo.email}</div>
+            <div style={{ fontWeight: "bold", overflow: "hidden", textOverflow: "ellipsis" }}>{userInfo.name}</div>
+            <div style={{ fontSize: "12px", color: "#666", overflow: "hidden", textOverflow: "ellipsis" }}>{userInfo.email}</div>
           </div>
           <button
             onClick={() => {
