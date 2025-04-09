@@ -135,14 +135,48 @@ export default function Home() {
 
             {/* Match results display */}
             {showResults && (
-              <MatchList
-                matches={matchVM.getFilteredMatches()}
-                currentTeacher={userVM.currentTeacher}
-                onShowTeacherInfo={matchVM.showTeacherInfo}
-                onBackToForm={handleBackToForm}
-                title={matchVM.isDebugMode ? "配對結果 (Debug 模式)" : "配對結果"}
-                isDebugMode={matchVM.isDebugMode} // 傳遞 debug 模式狀態
-              />
+              <>
+                {/* Debug 模式下的用戶視角切換按鈕 */}
+                {matchVM.isDebugMode && (
+                  <div style={{
+                    marginBottom: "15px", 
+                    padding: "10px", 
+                    backgroundColor: "#f8f9fa", 
+                    borderRadius: "5px",
+                    border: "1px solid #ddd"
+                  }}>
+                    <label style={{ 
+                      display: "flex", 
+                      alignItems: "center",
+                      justifyContent: "space-between" 
+                    }}>
+                      <span>Debug 模式: {matchVM.userView ? '用戶視角' : '所有配對'}</span>
+                      <button
+                        onClick={() => matchVM.toggleUserView()}
+                        style={{
+                          padding: "5px 10px",
+                          backgroundColor: matchVM.userView ? "#28a745" : "#007bff",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        {matchVM.userView ? "顯示所有配對" : "切換到用戶視角"}
+                      </button>
+                    </label>
+                  </div>
+                )}
+                
+                <MatchList
+                  matches={matchVM.getFilteredMatches()}
+                  currentTeacher={userVM.currentTeacher}
+                  onShowTeacherInfo={matchVM.showTeacherInfo}
+                  onBackToForm={handleBackToForm}
+                  title={matchVM.getViewModeTitle()}
+                  isDebugMode={matchVM.isDebugMode && !matchVM.userView} // 只有在 Debug 模式且非用戶視角時才顯示所有配對
+                />
+              </>
             )}
 
             {/* Teacher info modal */}

@@ -7,6 +7,7 @@ export const useMatchViewModel = (currentTeacher: Teacher | null) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isDebugMode, setIsDebugMode] = useState(false);
+  const [userView, setUserView] = useState(false); // 新增狀態，用於在 debug 模式下模擬使用者視角
   const [teacherInfo, setTeacherInfo] = useState<{id: number | undefined, email: string} | null>(null);
 
   // Fetch matches data from API
@@ -84,8 +85,13 @@ export const useMatchViewModel = (currentTeacher: Teacher | null) => {
     }
   };
 
-  // Get visible matches based on current mode
+  // 獲取當前應該顯示的配對
   const getFilteredMatches = () => {
+    // 如果是 debug 模式但啟用了用戶視角，則返回用戶視角的配對
+    if (isDebugMode && userView) {
+      return getVisibleMatches(matches, false, currentTeacher);
+    }
+    // 否則返回一般的配對結果
     return getVisibleMatches(matches, isDebugMode, currentTeacher);
   };
 
@@ -103,13 +109,32 @@ export const useMatchViewModel = (currentTeacher: Teacher | null) => {
     setTeacherInfo(null);
   };
 
-  // Debug mode functions
+  // Debug 模式與用戶視角切換
   const enableDebugMode = () => {
     setIsDebugMode(true);
+    setUserView(false);
   };
   
   const disableDebugMode = () => {
     setIsDebugMode(false);
+    setUserView(false);
+  };
+  
+  // 新增：在 debug 模式下切換到用戶視角
+  const toggleUserView = () => {
+    if (isDebugMode) {
+      setUserView(!userView);
+    }
+  };
+
+  // 新增：檢查是否在 debug 模式下使用用戶視角
+  const isUserViewActive = () => isDebugMode && userView;
+  
+  // 新增：獲取顯示模式的標題
+  const getViewModeTitle = () => {
+    if (!isDebugMode) return "配對結果";
+    if (userView) return "配對結果 (用戶視角)";
+    return "配對結果 (Debug 模式)";
   };
 
   return {
@@ -117,6 +142,7 @@ export const useMatchViewModel = (currentTeacher: Teacher | null) => {
     loading,
     error,
     isDebugMode,
+    userView,
     teacherInfo,
     fetchMatches,
     createTeacher,
@@ -126,6 +152,9 @@ export const useMatchViewModel = (currentTeacher: Teacher | null) => {
     closeTeacherInfo,
     enableDebugMode,
     disableDebugMode,
+    toggleUserView,
+    isUserViewActive,
+    getViewModeTitle,
     setIsDebugMode
   };
 };
