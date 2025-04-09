@@ -6,6 +6,7 @@ use axum::{
     routing::{get, post},
     Router, extract::State,
     http::Method, extract::Json,
+    response::IntoResponse,
 };
 use serde::Serialize;
 use serde::Deserialize;
@@ -46,6 +47,7 @@ async fn main() {
         .route("/api/teachers", post(create_teacher))
         .route("/api/matches", get(find_matches))
         .route("/api/google-login", post(google_login))
+        .route("/api/districts", get(get_districts))
         .with_state(pool)
         .layer(cors);
 
@@ -54,6 +56,12 @@ async fn main() {
     
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
+}
+
+// 返回縣市區域資料
+async fn get_districts() -> impl IntoResponse {
+    let districts = db::get_taiwan_districts();
+    Json(districts)
 }
 
 async fn root() -> &'static str {
@@ -105,6 +113,21 @@ async fn create_teacher(
     Json(mut teacher): Json<Teacher>
 ) -> Result<Json<Teacher>, (axum::http::StatusCode, String)> {
     tracing::info!("接收到的教師數據: {:?}", teacher);
+
+    // 檢查必填欄位
+    if teacher.current_county.trim().is_empty() {
+        return Err((
+            axum::http::StatusCode::BAD_REQUEST,
+            "縣市不能為空".to_string(),
+        ));
+    }
+    
+    if teacher.current_district.trim().is_empty() {
+        return Err((
+            axum::http::StatusCode::BAD_REQUEST,
+            "區域不能為空".to_string(),
+        ));
+    }
 
     // 如果名稱為空，設置為預設值
     if teacher.name.is_none() || teacher.name.as_ref().unwrap().is_empty() {

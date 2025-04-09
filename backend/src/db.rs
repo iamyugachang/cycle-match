@@ -2,6 +2,30 @@ use sqlx::{Pool, Postgres, Row};
 use crate::model::Teacher;
 use chrono::Utc;
 use uuid::Uuid;
+use serde_json::{Value, json};
+use once_cell::sync::Lazy;
+use std::sync::Arc;
+
+// 台灣縣市區域資料快取
+static TAIWAN_DISTRICTS: Lazy<Arc<Value>> = Lazy::new(|| {
+    let json_data = include_str!("../data/taiwan_districts.json");
+    Arc::new(serde_json::from_str(json_data).unwrap_or_else(|_| json!([
+        {
+            "districts": [
+                {
+                    "zip": "100",
+                    "name": "中正區"
+                }
+            ],
+            "name": "臺北市"
+        }
+    ])))
+});
+
+// 取得縣市區域資料
+pub fn get_taiwan_districts() -> Arc<Value> {
+    TAIWAN_DISTRICTS.clone()
+}
 
 // 用於生成顯示ID的函數
 pub fn generate_display_id(county: &str, district: &str) -> String {
@@ -270,12 +294,12 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
         Teacher {
             id: None,
             name: Some("測試教師1".to_string()),
-            display_id: Some("台北市大安區#001".to_string()),
+            display_id: Some("臺北市大安區#001".to_string()),
             email: format!("test1@example.com"),
             google_id: None,
             year: 114,
             subject: "數學".to_string(),
-            current_county: "台北市".to_string(),
+            current_county: "臺北市".to_string(),
             current_district: "大安區".to_string(),
             current_school: "大安國小".to_string(),
             target_counties: vec!["新北市".to_string()],
@@ -285,30 +309,30 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
         Teacher {
             id: None,
             name: Some("測試教師2".to_string()),
-            display_id: Some("台北市信義區#002".to_string()),
+            display_id: Some("臺北市信義區#002".to_string()),
             email: format!("test2@example.com"),
             google_id: None,
             year: 114,
             subject: "英文".to_string(),
-            current_county: "台北市".to_string(),
+            current_county: "臺北市".to_string(),
             current_district: "信義區".to_string(),
             current_school: "信義國小".to_string(),
-            target_counties: vec!["台北市".to_string(), "台中市".to_string()],
+            target_counties: vec!["臺北市".to_string(), "臺中市".to_string()],
             target_districts: vec!["大安區".to_string(), "西區".to_string()],
             created_at: None,
         },
         Teacher {
             id: None,
             name: Some("測試教師3".to_string()),
-            display_id: Some("台北市中正區#003".to_string()),
+            display_id: Some("臺北市中正區#003".to_string()),
             email: format!("test3@example.com"),
             google_id: None,
             year: 114,
             subject: "自然".to_string(),
-            current_county: "台北市".to_string(),
+            current_county: "臺北市".to_string(),
             current_district: "中正區".to_string(),
             current_school: "中正國小".to_string(),
-            target_counties: vec!["新北市".to_string(), "台中市".to_string()],
+            target_counties: vec!["新北市".to_string(), "臺中市".to_string()],
             target_districts: vec!["中和區".to_string(), "北區".to_string()],
             created_at: None,
         },
@@ -327,7 +351,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             current_county: "新北市".to_string(),
             current_district: "板橋區".to_string(),
             current_school: "板橋國小".to_string(),
-            target_counties: vec!["台北市".to_string()],
+            target_counties: vec!["臺北市".to_string()],
             target_districts: vec!["大安區".to_string()],
             created_at: None,
         },
@@ -342,7 +366,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             current_county: "新北市".to_string(),
             current_district: "中和區".to_string(),
             current_school: "中和國小".to_string(),
-            target_counties: vec!["台北市".to_string(), "桃園市".to_string()],
+            target_counties: vec!["臺北市".to_string(), "桃園市".to_string()],
             target_districts: vec!["中正區".to_string(), "中壢區".to_string()],
             created_at: None,
         },
@@ -357,7 +381,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             current_county: "新北市".to_string(),
             current_district: "三重區".to_string(),
             current_school: "三重國小".to_string(),
-            target_counties: vec!["台北市".to_string(), "台中市".to_string()],
+            target_counties: vec!["臺北市".to_string(), "臺中市".to_string()],
             target_districts: vec!["信義區".to_string(), "西區".to_string()],
             created_at: None,
         },
@@ -368,12 +392,12 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
         Teacher {
             id: None,
             name: Some("測試教師7".to_string()),
-            display_id: Some("台中市西區#007".to_string()),
+            display_id: Some("臺中市西區#007".to_string()),
             email: format!("test7@example.com"),
             google_id: None,
             year: 114,
             subject: "數學".to_string(),
-            current_county: "台中市".to_string(),
+            current_county: "臺中市".to_string(),
             current_district: "西區".to_string(),
             current_school: "西區國小".to_string(),
             target_counties: vec!["新北市".to_string()],
@@ -383,15 +407,15 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
         Teacher {
             id: None,
             name: Some("測試教師8".to_string()),
-            display_id: Some("台中市北區#008".to_string()),
+            display_id: Some("臺中市北區#008".to_string()),
             email: format!("test8@example.com"),
             google_id: None,
             year: 114,
             subject: "英文".to_string(),
-            current_county: "台中市".to_string(),
+            current_county: "臺中市".to_string(),
             current_district: "北區".to_string(),
             current_school: "北區國小".to_string(),
-            target_counties: vec!["台北市".to_string(), "新北市".to_string()],
+            target_counties: vec!["臺北市".to_string(), "新北市".to_string()],
             target_districts: vec!["大安區".to_string(), "三重區".to_string()],
             created_at: None,
         },
@@ -410,7 +434,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             current_county: "桃園市".to_string(),
             current_district: "中壢區".to_string(),
             current_school: "中壢國小".to_string(),
-            target_counties: vec!["新北市".to_string(), "台北市".to_string()],
+            target_counties: vec!["新北市".to_string(), "臺北市".to_string()],
             target_districts: vec!["中和區".to_string(), "大安區".to_string()],
             created_at: None,
         },
@@ -425,7 +449,7 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
             current_county: "桃園市".to_string(),
             current_district: "桃園區".to_string(),
             current_school: "桃園國小".to_string(),
-            target_counties: vec!["台中市".to_string(), "新北市".to_string()],
+            target_counties: vec!["臺中市".to_string(), "新北市".to_string()],
             target_districts: vec!["西區".to_string(), "板橋區".to_string()],
             created_at: None,
         },
