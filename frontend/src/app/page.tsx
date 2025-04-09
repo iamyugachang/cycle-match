@@ -11,6 +11,7 @@ import WelcomeBanner from "../components/WelcomeBanner";
 import TeacherFormContainer from "../components/TeacherFormContainer";
 import MatchList from "../components/MatchList";
 import TeacherInfoModal from "../components/TeacherInfoModal";
+import TeacherSwitcher from "../components/TeacherSwitcher";
 
 export default function Home() {
   // UI state
@@ -19,13 +20,20 @@ export default function Home() {
 
   // Initialize view models
   const userVM = useUserViewModel();
-  const matchVM = useMatchViewModel(userVM.currentTeacher);
+  const matchVM = useMatchViewModel(userVM.currentTeacher, userVM.allTeachers);
   
   // Function to handle teacher form submission
   const handleCreateTeacher = async (teacher) => {
     try {
       const createdTeacher = await matchVM.createTeacher(teacher, userVM.userInfo?.google_id);
+      
+      // 添加新教師到所有教師列表中
+      const updatedTeachers = [...userVM.allTeachers, createdTeacher];
+      userVM.setAllTeachers(updatedTeachers);
+      
+      // 設置當前教師為新創建的教師
       userVM.setCurrentTeacher(createdTeacher);
+      
       setShowResults(true);
       setShowForm(false);
     } catch (error) {
@@ -65,7 +73,7 @@ export default function Home() {
       try {
         const result = await userVM.debugLogin(googleId);
         
-        if (result?.teacher) {
+        if (result?.teachers?.length > 0) {
           // Teacher data was found, show matches
           matchVM.fetchMatches();
           setShowResults(true);
@@ -86,7 +94,7 @@ export default function Home() {
     try {
       const result = await userVM.handleGoogleLoginSuccess(credentialResponse);
       
-      if (result?.teacher) {
+      if (result?.teachers?.length > 0) {
         await matchVM.fetchMatches();
         setShowResults(true);
         setShowForm(false);
@@ -104,6 +112,14 @@ export default function Home() {
     matchVM.fetchMatches();
     setShowResults(true);
     setShowForm(false);
+  };
+
+  // 切換當前選中的教師
+  const handleSwitchTeacher = (teacherId: number) => {
+    if (userVM.switchTeacher(teacherId)) {
+      // 刷新匹配結果
+      matchVM.fetchMatches();
+    }
   };
 
   return (
@@ -136,6 +152,15 @@ export default function Home() {
             {/* Match results display */}
             {showResults && (
               <>
+                {/* 教師選擇器 - 僅當有多位教師時顯示 */}
+                {userVM.allTeachers.length > 1 && (
+                  <TeacherSwitcher 
+                    teachers={userVM.allTeachers} 
+                    currentTeacherId={userVM.currentTeacher?.id} 
+                    onSwitchTeacher={handleSwitchTeacher} 
+                  />
+                )}
+
                 {/* Debug 模式下的用戶視角切換按鈕 */}
                 {matchVM.isDebugMode && (
                   <div style={{

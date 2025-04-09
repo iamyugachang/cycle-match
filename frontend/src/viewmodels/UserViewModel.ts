@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Teacher, UserInfo } from '../types';
+import { Teacher, UserInfo, UserResponse } from '../types';
 
 export const useUserViewModel = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [currentTeacher, setCurrentTeacher] = useState<Teacher | null>(null);
+  const [allTeachers, setAllTeachers] = useState<Teacher[]>([]); // 存儲與當前用戶關聯的所有教師記錄
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   
@@ -38,9 +39,15 @@ export const useUserViewModel = () => {
         google_id: data.google_id || "",
       });
 
-      // 如果後端返回教師資訊，設定當前教師
+      // 設置所有關聯的教師記錄
+      const teachers = data.teachers || [];
+      setAllTeachers(teachers);
+
+      // 如果有教師記錄，設置第一個作為當前選擇的教師（向後兼容）
       if (data.teacher) {
         setCurrentTeacher(data.teacher);
+      } else if (teachers.length > 0) {
+        setCurrentTeacher(teachers[0]);
       }
 
       return {
@@ -50,8 +57,9 @@ export const useUserViewModel = () => {
           email: data.email || "",
           google_id: data.google_id || "",
         },
-        teacher: data.teacher
-      };
+        teacher: data.teacher || (teachers.length > 0 ? teachers[0] : null),
+        teachers: teachers
+      } as UserResponse;
     } catch (err) {
       console.error("後端驗證失敗:", err);
       setError(err instanceof Error ? err.message : "Google 登入驗證失敗，請稍後再試");
@@ -69,8 +77,19 @@ export const useUserViewModel = () => {
   const logout = () => {
     setUserInfo(null);
     setCurrentTeacher(null);
+    setAllTeachers([]);
     // 重新載入頁面以重設 Google Login
     window.location.reload();
+  };
+
+  // 切換當前選擇的教師記錄
+  const switchTeacher = (teacherId: number) => {
+    const teacher = allTeachers.find(t => t.id === teacherId);
+    if (teacher) {
+      setCurrentTeacher(teacher);
+      return true;
+    }
+    return false;
   };
 
   // 模擬登入（用於 DEBUG 模式）
@@ -100,19 +119,33 @@ export const useUserViewModel = () => {
         const teachers = await response.json();
         console.log("Debug mode: 獲取的教師資料:", teachers);
         
+        setAllTeachers(teachers);
+        
         if (teachers && teachers.length > 0) {
           // 找到教師資料，設置為當前教師
           setCurrentTeacher(teachers[0]);
-          return { userInfo: mockUserInfo, teacher: teachers[0] };
+          return { 
+            userInfo: mockUserInfo, 
+            teacher: teachers[0],
+            teachers: teachers
+          };
         }
       }
       
       // 無教師資料或獲取失敗
-      return { userInfo: mockUserInfo, teacher: null };
+      return { 
+        userInfo: mockUserInfo, 
+        teacher: null,
+        teachers: []
+      };
     } catch (err) {
       console.error("Debug mode: 獲取教師資料失敗:", err);
       setError("獲取教師資料失敗，請稍後再試");
-      return { userInfo: mockUserInfo, teacher: null };
+      return { 
+        userInfo: mockUserInfo, 
+        teacher: null,
+        teachers: []
+      };
     } finally {
       setLoading(false);
     }
@@ -121,12 +154,15 @@ export const useUserViewModel = () => {
   return {
     userInfo,
     currentTeacher,
+    allTeachers,
     loading,
     error,
     setUserInfo,
     setCurrentTeacher,
+    setAllTeachers,
     handleGoogleLoginSuccess,
     handleGoogleLoginFailure,
+    switchTeacher,
     logout,
     debugLogin
   };

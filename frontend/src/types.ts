@@ -27,3 +27,10 @@ export interface MatchResult {
   match_type: string;
   teachers: Teacher[];
 }
+
+// 用戶資料響應，包含多個教師記錄
+export interface UserResponse {
+  userInfo: UserInfo;
+  teacher: Teacher | null;  // 向後兼容
+  teachers: Teacher[];      // 所有關聯的教師記錄
+}

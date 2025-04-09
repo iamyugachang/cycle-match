@@ -168,6 +168,55 @@ pub async fn get_teacher_by_google_id(
     })
 }
 
+pub async fn get_teachers_by_google_id(
+    pool: &Pool<Postgres>,
+    google_id: &str,
+) -> Result<Vec<Teacher>, sqlx::Error> {
+    // 返回所有與指定 Google ID 關聯的教師記錄
+    let rows = sqlx::query(
+        r#"
+        SELECT 
+            id, 
+            name,
+            display_id,
+            email,
+            google_id,
+            year, 
+            current_county,
+            current_district,
+            current_school,
+            target_counties,
+            target_districts,
+            created_at
+        FROM teachers 
+        WHERE google_id = $1
+        "#
+    )
+    .bind(google_id)
+    .fetch_all(pool)
+    .await?;
+
+    // 將查詢結果轉換為 Teacher 結構的向量
+    let teachers = rows.into_iter().map(|row| {
+        Teacher {
+            id: row.get("id"),
+            name: row.get("name"),
+            display_id: row.get("display_id"),
+            email: row.get("email"),
+            google_id: row.get("google_id"),
+            year: row.get("year"),
+            current_county: row.get("current_county"),
+            current_district: row.get("current_district"),
+            current_school: row.get("current_school"),
+            target_counties: row.get("target_counties"),
+            target_districts: row.get("target_districts"),
+            created_at: row.get("created_at"),
+        }
+    }).collect();
+
+    Ok(teachers)
+}
+
 pub async fn init_db(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
     // 先刪除舊表（如果存在）
     sqlx::query("DROP TABLE IF EXISTS teachers")

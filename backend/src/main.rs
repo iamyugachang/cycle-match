@@ -178,16 +178,20 @@ async fn google_login(
         Ok(user_info) => {
             tracing::info!("Google 登入成功: {:?}", user_info);
 
-            // 在驗證成功後，檢查是否有與 google_id 關聯的教師資料
+            // 在驗證成功後，獲取與 google_id 關聯的所有教師資料
             let google_id = &user_info.email;
-            let teacher = db::get_teacher_by_google_id(&pool, google_id).await.ok();
+            let teachers = db::get_teachers_by_google_id(&pool, google_id).await.unwrap_or_default();
+
+            // 如果有教師資料，選擇第一筆作為主要資料（向後兼容）
+            let primary_teacher = teachers.first().cloned();
 
             Ok(Json(serde_json::json!({
                 "email": user_info.email,
                 "google_id": user_info.email,
                 "name": user_info.name,
                 "picture": user_info.picture,
-                "teacher": teacher // 返回教師資料（如果存在）
+                "teacher": primary_teacher, // 向後兼容，只返回第一筆教師記錄
+                "teachers": teachers // 新增: 返回所有關聯的教師記錄
             })))
         }
         Err(err) => {

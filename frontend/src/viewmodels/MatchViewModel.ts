@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { MatchResult, Teacher } from '../types';
 import { getMatchTypeName, isUserInvolved, sortMatches, getVisibleMatches } from '../utils/matchUtils';
 
-export const useMatchViewModel = (currentTeacher: Teacher | null) => {
+export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: Teacher[] = []) => {
   const [matches, setMatches] = useState<MatchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isDebugMode, setIsDebugMode] = useState(false);
-  const [userView, setUserView] = useState(false); // 新增狀態，用於在 debug 模式下模擬使用者視角
+  const [userView, setUserView] = useState(false); // 用於在 debug 模式下模擬使用者視角
   const [teacherInfo, setTeacherInfo] = useState<{id: number | undefined, email: string} | null>(null);
 
   // Fetch matches data from API
@@ -85,20 +85,33 @@ export const useMatchViewModel = (currentTeacher: Teacher | null) => {
     }
   };
 
-  // 獲取當前應該顯示的配對
+  // 獲取與用戶所有教師相關的配對
   const getFilteredMatches = () => {
-    // 如果是 debug 模式但啟用了用戶視角，則返回用戶視角的配對
+    // 如果是 debug 模式但啟用了用戶視角，只顯示與當前選擇的教師相關的配對
     if (isDebugMode && userView) {
       return getVisibleMatches(matches, false, currentTeacher);
     }
-    // 否則返回一般的配對結果
-    return getVisibleMatches(matches, isDebugMode, currentTeacher);
+    
+    // Debug 模式顯示所有配對
+    if (isDebugMode) {
+      return matches;
+    }
+    
+    // 正常模式：顯示與用戶所有教師相關的配對
+    if (allTeachers.length === 0) {
+      return [];
+    }
+    
+    // 過濾出與用戶任何一個教師相關的配對
+    return matches.filter(match => 
+      allTeachers.some(teacher => isUserInvolved(match, teacher))
+    );
   };
 
   // Get sorted matches with current user's matches first
   const getSortedMatches = () => {
-    return sortMatches(matches, currentTeacher);
-  }; 
+    return sortMatches(getFilteredMatches(), currentTeacher);
+  };
 
   // Teacher info display management
   const showTeacherInfo = (id: number | undefined, email: string) => {
@@ -120,17 +133,17 @@ export const useMatchViewModel = (currentTeacher: Teacher | null) => {
     setUserView(false);
   };
   
-  // 新增：在 debug 模式下切換到用戶視角
+  // 在 debug 模式下切換到用戶視角
   const toggleUserView = () => {
     if (isDebugMode) {
       setUserView(!userView);
     }
   };
 
-  // 新增：檢查是否在 debug 模式下使用用戶視角
+  // 檢查是否在 debug 模式下使用用戶視角
   const isUserViewActive = () => isDebugMode && userView;
   
-  // 新增：獲取顯示模式的標題
+  // 獲取顯示模式的標題
   const getViewModeTitle = () => {
     if (!isDebugMode) return "配對結果";
     if (userView) return "配對結果 (用戶視角)";
