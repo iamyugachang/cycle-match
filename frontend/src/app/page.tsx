@@ -141,6 +141,7 @@ export default function Home() {
                 onShowTeacherInfo={matchVM.showTeacherInfo}
                 onBackToForm={handleBackToForm}
                 title={matchVM.isDebugMode ? "配對結果 (Debug 模式)" : "配對結果"}
+                isDebugMode={matchVM.isDebugMode} // 傳遞 debug 模式狀態
               />
             )}
 

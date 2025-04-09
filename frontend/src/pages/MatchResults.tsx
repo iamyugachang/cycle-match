@@ -76,36 +76,52 @@ const MatchResults: React.FC = () => {
             )}
           </div>
           
-          {/* Debug 模式切換開關 */}
-          <div className="mt-6 mb-2">
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isDebugMode}
-                onChange={() => setIsDebugMode(!isDebugMode)}
-                className="sr-only peer"
-              />
-              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              <span className="ml-3 text-sm font-medium text-gray-700">顯示所有可能配對</span>
-            </label>
-          </div>
-          
-          {/* 只在 debug 模式下顯示所有配對 */}
-          {isDebugMode && (
-            <div className="mt-8">
-              <h2 className="text-2xl font-semibold mb-4">所有可能的配對</h2>
-              {matches.length > 0 ? (
-                matches.map(match => (
-                  <MatchCard 
-                    key={match.id} 
-                    match={match} 
-                    currentTeacher={teacher} 
-                    showDetailedView={true}
+          {isDebugMode ? (
+            <>
+              {/* Debug 模式切換開關 */}
+              <div className="mt-6 mb-2">
+                <label className="inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={true}
+                    onChange={() => setIsDebugMode(false)}
+                    className="sr-only peer"
                   />
-                ))
-              ) : (
-                <div className="text-gray-500">目前沒有任何配對</div>
-              )}
+                  <div className="relative w-11 h-6 bg-blue-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                  <span className="ml-3 text-sm font-medium text-gray-700">關閉所有可能配對顯示</span>
+                </label>
+              </div>
+              
+              {/* 只在 debug 模式下顯示所有配對 */}
+              <div className="mt-8">
+                <h2 className="text-2xl font-semibold mb-4">所有可能的配對</h2>
+                {matches.length > 0 ? (
+                  matches.map(match => (
+                    <MatchCard 
+                      key={match.id} 
+                      match={match} 
+                      currentTeacher={teacher} 
+                      showDetailedView={true}
+                    />
+                  ))
+                ) : (
+                  <div className="text-gray-500">目前沒有任何配對</div>
+                )}
+              </div>
+            </>
+          ) : (
+            /* 非 debug 模式下的 debug 開關 */
+            <div className="mt-6 mb-2">
+              <label className="inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={false}
+                  onChange={() => setIsDebugMode(true)}
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                <span className="ml-3 text-sm font-medium text-gray-700">顯示所有可能配對</span>
+              </label>
             </div>
           )}
         </>

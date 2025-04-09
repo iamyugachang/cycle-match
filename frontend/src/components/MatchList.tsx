@@ -7,6 +7,7 @@ interface MatchListProps {
   onShowTeacherInfo: (id: number | undefined, email: string) => void;
   onBackToForm: () => void;
   title?: string;
+  isDebugMode?: boolean;
 }
 
 const MatchList: React.FC<MatchListProps> = ({
@@ -14,7 +15,8 @@ const MatchList: React.FC<MatchListProps> = ({
   currentTeacher,
   onShowTeacherInfo,
   onBackToForm,
-  title = "配對結果"
+  title = "配對結果",
+  isDebugMode = false
 }) => {
   if (matches.length === 0) {
     return (
@@ -95,23 +97,25 @@ const MatchList: React.FC<MatchListProps> = ({
         </div>
       )}
 
-      {/* 所有配對 */}
-      <div>
-        <h3 style={{ borderBottom: "2px solid #6c757d", paddingBottom: "5px", marginBottom: "15px" }}>
-          所有可能的配對
-        </h3>
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {matchesSorted.map((match, index) => (
-            <MatchCard 
-              key={index}
-              match={match}
-              currentTeacher={currentTeacher}
-              onShowTeacherInfo={onShowTeacherInfo}
-              highlighted={false}
-            />
-          ))}
-        </ul>
-      </div>
+      {/* 只在 debug 模式下顯示所有配對 */}
+      {isDebugMode && (
+        <div>
+          <h3 style={{ borderBottom: "2px solid #6c757d", paddingBottom: "5px", marginBottom: "15px" }}>
+            所有可能的配對
+          </h3>
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {matchesSorted.map((match, index) => (
+              <MatchCard 
+                key={index}
+                match={match}
+                currentTeacher={currentTeacher}
+                onShowTeacherInfo={onShowTeacherInfo}
+                highlighted={false}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
