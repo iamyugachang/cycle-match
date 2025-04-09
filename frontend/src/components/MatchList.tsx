@@ -18,7 +18,13 @@ const MatchList: React.FC<MatchListProps> = ({
   title = "配對結果",
   isDebugMode = false
 }) => {
-  if (matches.length === 0) {
+  // Filter matches for the current teacher
+  const userMatches = currentTeacher
+    ? matches.filter(match => isUserInvolved(match, currentTeacher))
+    : [];
+
+  // If no matches are found, show the "not found" message
+  if (userMatches.length === 0 && !isDebugMode) {
     return (
       <div style={{ padding: "20px", border: "1px solid #ddd", borderRadius: "5px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
@@ -52,11 +58,6 @@ const MatchList: React.FC<MatchListProps> = ({
       if (!aInvolved && bInvolved) return 1;
       return 0;
     }) : matches;
-
-  // Find user's matches
-  const userMatches = currentTeacher ? 
-    matchesSorted.filter(match => isUserInvolved(match, currentTeacher)) : 
-    [];
 
   return (
     <div style={{ padding: "20px", border: "1px solid #ddd", borderRadius: "5px" }}>
