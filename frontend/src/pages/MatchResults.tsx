@@ -13,6 +13,9 @@ const MatchResults: React.FC = () => {
   const { currentUser, teacher } = useAuth();
   const navigate = useNavigate();
   
+  // 取得當前民國年
+  const currentYear = new Date().getFullYear() - 1911;
+  
   useEffect(() => {
     if (!currentUser) {
       navigate("/login");
@@ -33,7 +36,11 @@ const MatchResults: React.FC = () => {
         }
         
         const data = await response.json();
-        setMatches(data);
+        // 篩選當年度的配對結果
+        const currentYearData = data.filter(match => 
+          match.teachers.some(t => t.year === currentYear)
+        );
+        setMatches(currentYearData);
         setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error occurred");
@@ -42,14 +49,14 @@ const MatchResults: React.FC = () => {
     };
     
     fetchMatches();
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, currentYear]);
   
   // 根據是否為 debug mode 過濾顯示的配對
   const userMatches = matches.filter(match => teacher && isUserInvolved(match, teacher));
   
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">配對結果</h1>
+      <h1 className="text-3xl font-bold mb-6">{currentYear}年度配對結果</h1>
       
       {loading ? (
         <div className="text-center py-8">載入中...</div>

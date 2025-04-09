@@ -20,6 +20,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   onViewAllMatches,
   onDebugLogin
 }) => {
+  // 取得當前民國年
+  const currentYear = new Date().getFullYear() - 1911;
+  
   return (
     <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto", position: "relative" }}>
       {/* Debug Mode dropdown - left top corner */}
@@ -38,7 +41,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       )}
 
       <h1 style={{ textAlign: "center", marginBottom: "20px", marginTop: "40px" }}>
-        CircleMatch - 教師介聘配對系統
+        CircleMatch - {currentYear}年度教師介聘配對系統
       </h1>
 
       {children}

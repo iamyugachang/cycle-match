@@ -14,6 +14,9 @@ const TeacherFormContainer: React.FC<TeacherFormContainerProps> = ({
   loading,
   error
 }) => {
+  // 取得當前民國年度
+  const currentYear = new Date().getFullYear() - 1911;
+  
   return (
     <div style={{ 
       padding: "20px", 
@@ -21,7 +24,7 @@ const TeacherFormContainer: React.FC<TeacherFormContainerProps> = ({
       borderRadius: "5px" 
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
-        <h2 style={{ margin: 0 }}>登記介聘資料</h2>
+        <h2 style={{ margin: 0 }}>登記{currentYear}年度介聘資料</h2>
       </div>
       
       <TeacherForm onSubmit={onSubmit} defaultEmail={defaultEmail} />

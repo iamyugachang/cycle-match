@@ -9,6 +9,9 @@ interface TeacherFormProps {
 }
 
 const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }) => {
+  // 自動計算當前民國年份
+  const currentYear = new Date().getFullYear() - 1911;
+  
   const [formData, setFormData] = useState<Teacher>({
     id: undefined,
     email: defaultEmail,
@@ -20,7 +23,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
     subject: "",
     display_id: "",
     google_id: undefined,
-    year: new Date().getFullYear() - 1911 // 預設為當前民國年
+    year: currentYear // 預設為當前民國年
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -99,6 +102,29 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
         />
         <small style={{ color: "#666", marginTop: "4px", display: "block" }}>
           用於教師間聯絡，並顯示給配對成功的教師
+        </small>
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <label htmlFor="year" style={{ display: "block", marginBottom: "5px" }}>
+          年度
+        </label>
+        <input
+          type="text"
+          id="year"
+          name="year"
+          value={`${formData.year}年`}
+          style={{
+            width: "100%",
+            padding: "8px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            backgroundColor: "#f5f5f5"
+          }}
+          readOnly
+        />
+        <small style={{ color: "#666", marginTop: "4px", display: "block" }}>
+          介聘資料適用年度（自動帶入當前年度）
         </small>
       </div>
 

@@ -9,6 +9,9 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [userView, setUserView] = useState(false); // 用於在 debug 模式下模擬使用者視角
   const [teacherInfo, setTeacherInfo] = useState<{id: number | undefined, email: string} | null>(null);
+  
+  // 取得當前民國年度
+  const currentYear = new Date().getFullYear() - 1911;
 
   // Fetch matches data from API
   const fetchMatches = async () => {
@@ -25,8 +28,15 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
       }
 
       const matchData = await matchResponse.json();
-      setMatches(matchData);
-      return matchData;
+      
+      // 篩選出當前年度的配對結果
+      const currentYearMatches = matchData.filter((match: MatchResult) => {
+        // 只要配對中有一位老師是當前年度的，就顯示此配對
+        return match.teachers.some(teacher => teacher.year === currentYear);
+      });
+      
+      setMatches(currentYearMatches);
+      return currentYearMatches;
     } catch (err) {
       console.error("資料獲取錯誤:", err);
       setError(err instanceof Error ? err.message : "未知錯誤");
@@ -50,6 +60,7 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
       const teacherWithGoogleId = {
         ...teacher,
         google_id: googleId,
+        year: currentYear, // 確保設定當前年度
       };
   
       console.log("發送到後端的資料:", JSON.stringify(teacherWithGoogleId, null, 2));
@@ -87,14 +98,19 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
 
   // 獲取與用戶所有教師相關的配對
   const getFilteredMatches = () => {
+    // 先過濾出當前年度的配對
+    const yearMatches = matches.filter(match => 
+      match.teachers.some(teacher => teacher.year === currentYear)
+    );
+    
     // 如果是 debug 模式但啟用了用戶視角，只顯示與當前選擇的教師相關的配對
     if (isDebugMode && userView) {
-      return getVisibleMatches(matches, false, currentTeacher);
+      return getVisibleMatches(yearMatches, false, currentTeacher);
     }
     
     // Debug 模式顯示所有配對
     if (isDebugMode) {
-      return matches;
+      return yearMatches;
     }
     
     // 正常模式：顯示與用戶所有教師相關的配對
@@ -103,7 +119,7 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
     }
     
     // 過濾出與用戶任何一個教師相關的配對
-    return matches.filter(match => 
+    return yearMatches.filter(match => 
       allTeachers.some(teacher => isUserInvolved(match, teacher))
     );
   };
@@ -145,9 +161,9 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
   
   // 獲取顯示模式的標題
   const getViewModeTitle = () => {
-    if (!isDebugMode) return "配對結果";
-    if (userView) return "配對結果 (用戶視角)";
-    return "配對結果 (Debug 模式)";
+    if (!isDebugMode) return `${currentYear}年度配對結果`;
+    if (userView) return `${currentYear}年度配對結果 (用戶視角)`;
+    return `${currentYear}年度配對結果 (Debug 模式)`;
   };
 
   return {
@@ -157,6 +173,7 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
     isDebugMode,
     userView,
     teacherInfo,
+    currentYear,
     fetchMatches,
     createTeacher,
     getFilteredMatches,
