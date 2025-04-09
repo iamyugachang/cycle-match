@@ -132,6 +132,8 @@ const MatchCard: React.FC<MatchCardProps> = ({
   const isCurrentUserInvolved = currentTeacher && 
     match.teachers.some(teacher => teacher.id === currentTeacher.id);
   
+  console.log("Match data before calling getMatchTypeName:", match);
+
   return (
     <li style={{ 
       marginBottom: "15px", 
@@ -141,7 +143,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
       backgroundColor: isCurrentUserInvolved ? "#f0f7ff" : "white" 
     }}>
       <div style={{ fontWeight: "bold", marginBottom: "10px", fontSize: "1.1rem" }}>
-        {getMatchTypeName(match.match_type)} ({match.teachers.length} 人)
+        {getMatchTypeName(match)}
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>

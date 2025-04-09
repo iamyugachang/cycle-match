@@ -1,19 +1,11 @@
 import { MatchResult, Teacher } from "../types";
 
 /**
- * Get the display name for a match type
+ * Get the display name for a match based on number of teachers
  */
-export const getMatchTypeName = (matchType: string) => {
-  switch (matchType) {
-    case "direct":
-      return "雙向調";
-    case "triangle":
-      return "三角調";
-    case "cycle":
-      return "多角調";
-    default:
-      return "未知類型";
-  }
+export const getMatchTypeName = (match?: { teachers?: any[] }) => {
+  if (!match?.teachers) return "未配對";
+  return `${match.teachers.length} 角調`;
 };
 
 /**
