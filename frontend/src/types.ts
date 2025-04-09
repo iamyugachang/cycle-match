@@ -18,6 +18,7 @@ export interface Teacher {
   subject: string;
   display_id: string;
   google_id?: string;
+  year: number;  // Added required year field
 }
 
 // Match types

@@ -19,7 +19,8 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
     target_districts: [""],
     subject: "",
     display_id: "",
-    google_id: undefined
+    google_id: undefined,
+    year: new Date().getFullYear() - 1911 // 預設為當前民國年
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -87,6 +88,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
           name="email"
           value={formData.email}
           onChange={handleChange}
+          placeholder="例如：example@example.com"
           style={{
             width: "100%",
             padding: "8px",
@@ -110,6 +112,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
           name="subject"
           value={formData.subject}
           onChange={handleChange}
+          placeholder="例如：一般、數學、美術"
           style={{
             width: "100%",
             padding: "8px",
@@ -132,6 +135,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
             name="current_county"
             value={formData.current_county}
             onChange={handleChange}
+            placeholder="台北市、新北市等"
             style={{
               width: "100%",
               padding: "8px",
@@ -151,6 +155,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
             name="current_district"
             value={formData.current_district}
             onChange={handleChange}
+            placeholder="例如：大安區、板橋區、南屯區"
             style={{
               width: "100%",
               padding: "8px",
@@ -172,6 +177,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
           name="current_school"
           value={formData.current_school}
           onChange={handleChange}
+          placeholder="例如：大安國小、板橋國小"
           style={{
             width: "100%",
             padding: "8px",
@@ -194,6 +200,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
                 type="text"
                 value={county}
                 onChange={(e) => handleTargetChange(index, "target_counties", e.target.value)}
+                placeholder="例如：台北市、台中市"
                 style={{
                   width: "100%",
                   padding: "8px",
@@ -211,6 +218,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
                 type="text"
                 value={formData.target_districts[index] || ""}
                 onChange={(e) => handleTargetChange(index, "target_districts", e.target.value)}
+                placeholder="例如：大安區、中壢區"
                 style={{
                   width: "100%",
                   padding: "8px",
