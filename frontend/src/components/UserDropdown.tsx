@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { UserInfo } from '../types';
+import { useState } from "react";
+import { UserInfo } from "../types";
 
 interface UserDropdownProps {
   userInfo: UserInfo;
@@ -7,124 +7,124 @@ interface UserDropdownProps {
   onLogout: () => void;
 }
 
-const UserDropdown: React.FC<UserDropdownProps> = ({ userInfo, onShowResults, onLogout }) => {
-  const [userDropdownHover, setUserDropdownHover] = useState(false);
-  const userDropdownRef = useRef<HTMLDivElement>(null);
-  
-  // 定義固定寬度，確保頭像區域和下拉選單寬度一致
-  const dropdownWidth = "180px";
+const UserDropdown: React.FC<UserDropdownProps> = ({ 
+  userInfo, 
+  onShowResults, 
+  onLogout 
+}) => {
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
 
   return (
-    <div 
-      style={{ position: "absolute", top: "10px", right: "10px" }}
-      ref={userDropdownRef}
-      onMouseEnter={() => setUserDropdownHover(true)}
-      onMouseLeave={() => setUserDropdownHover(false)}
-    >
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        width: dropdownWidth
-      }}>
-        <div
-          style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: "10px", 
-            cursor: "pointer",
-            padding: "4px 8px",
-            borderRadius: userDropdownHover ? "4px 4px 0 0" : "4px",
-            backgroundColor: userDropdownHover ? "#f8f9fa" : "transparent",
-            transition: "background-color 0.2s ease-in-out",
-            width: "100%",
-          }}
-        >
-          {userInfo.picture ? (
-            <img
-              src={userInfo.picture}
-              alt="User Avatar"
-              style={{ 
-                width: "32px", 
-                height: "32px", 
-                borderRadius: "50%",
-                flexShrink: 0,
-              }}
-            />
-          ) : (
-            <div style={{
-              width: "32px",
-              height: "32px",
+    <div style={{ 
+      position: "absolute", 
+      top: "10px", 
+      right: "10px",
+      zIndex: 100
+    }}>
+      {/* User avatar/button */}
+      <button
+        onClick={toggleDropdown}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          padding: "5px 10px",
+          background: "white",
+          border: "1px solid #ddd",
+          borderRadius: "20px",
+          cursor: "pointer"
+        }}
+      >
+        {userInfo.picture ? (
+          <img
+            src={userInfo.picture}
+            alt={userInfo.name}
+            style={{
+              width: "24px",
+              height: "24px",
+              borderRadius: "50%",
+              marginRight: "8px"
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: "24px",
+              height: "24px",
               borderRadius: "50%",
               backgroundColor: "#007bff",
+              color: "white",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "16px",
-              flexShrink: 0,
-            }}>
-              {userInfo.name.charAt(0).toUpperCase()}
-            </div>
-          )}
-          <span style={{ 
-            overflow: "hidden", 
-            textOverflow: "ellipsis", 
-            whiteSpace: "nowrap" 
-          }}>
-            {userInfo.name}
-          </span>
-        </div>
-        
-        {userDropdownHover && (
-          <div
-            style={{
-              backgroundColor: "#f8f9fa",
-              border: "1px solid #ddd",
-              borderTop: "none",
-              borderRadius: "0 0 4px 4px",
-              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-              width: "100%",
+              marginRight: "8px",
+              fontSize: "12px"
             }}
           >
-            <button
-              onClick={onShowResults}
-              style={{
-                display: "block",
-                width: "100%",
-                padding: "10px",
-                textAlign: "left",
-                border: "none",
-                backgroundColor: "transparent",
-                cursor: "pointer",
-                transition: "background-color 0.2s",
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "#f0f0f0"; }}
-              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
-            >
-              顯示我的配對結果
-            </button>
-            <button
-              onClick={onLogout}
-              style={{
-                display: "block",
-                width: "100%",
-                padding: "10px",
-                textAlign: "left",
-                border: "none", 
-                backgroundColor: "transparent",
-                cursor: "pointer",
-                transition: "background-color 0.2s",
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "#f0f0f0"; }}
-              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
-            >
-              登出
-            </button>
+            {userInfo.name.charAt(0).toUpperCase()}
           </div>
         )}
-      </div>
+        {userInfo.name}
+      </button>
+
+      {/* Dropdown menu */}
+      {showDropdown && (
+        <div
+          style={{
+            position: "absolute",
+            top: "40px",
+            right: "0",
+            backgroundColor: "white",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+            width: "150px"
+          }}
+        >
+          <div style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
+            <div style={{ fontWeight: "bold" }}>{userInfo.name}</div>
+            <div style={{ fontSize: "12px", color: "#666" }}>{userInfo.email}</div>
+          </div>
+          <button
+            onClick={() => {
+              onShowResults();
+              setShowDropdown(false);
+            }}
+            style={{
+              display: "block",
+              width: "100%",
+              textAlign: "left",
+              padding: "10px",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              borderBottom: "1px solid #eee"
+            }}
+          >
+            查看配對結果
+          </button>
+          <button
+            onClick={() => {
+              onLogout();
+              setShowDropdown(false);
+            }}
+            style={{
+              display: "block",
+              width: "100%",
+              textAlign: "left",
+              padding: "10px",
+              background: "none",
+              border: "none",
+              cursor: "pointer"
+            }}
+          >
+            登出
+          </button>
+        </div>
+      )}
     </div>
   );
 };

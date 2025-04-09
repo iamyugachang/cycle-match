@@ -1,226 +1,281 @@
 "use client";
 
-import { useState, useEffect} from "react";
-
-interface Teacher {
-  id?: number;
-  name?: string;            // 名稱字段變為可選
-  display_id?: string;      // 顯示代號
-  email: string;
-  year: number;
-  current_county: string;
-  current_district: string;
-  current_school: string;
-  target_counties: string[];
-  target_districts: string[];
-}
+import { useState, useEffect, FormEvent } from "react";
+import { Teacher } from "../types";
 
 interface TeacherFormProps {
   onSubmit: (teacher: Teacher) => void;
   defaultEmail?: string;
 }
 
-export default function TeacherForm({ onSubmit, defaultEmail }: TeacherFormProps) {
-  const currentROCYear = new Date().getFullYear() - 1911;
-  
-  const [teacher, setTeacher] = useState<Teacher>({
-    email: defaultEmail || "",
-    year: currentROCYear,
+const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }) => {
+  const [formData, setFormData] = useState<Teacher>({
+    id: undefined,
+    email: defaultEmail,
     current_county: "",
     current_district: "",
     current_school: "",
     target_counties: [""],
-    target_districts: [""]
+    target_districts: [""],
+    subject: "",
+    display_id: "",
+    google_id: undefined
   });
 
-  useEffect(() => {
-    if (defaultEmail) {
-      setTeacher((prev) => ({ ...prev, email: defaultEmail }));
-    }
-  }, [defaultEmail]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setTeacher({ ...teacher, [name]: value });
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleTargetChange = (index: number, field: string, value: string) => {
-    if (field === 'county') {
-      const counties = [...teacher.target_counties];
-      counties[index] = value;
-      setTeacher({ ...teacher, target_counties: counties });
-    } else {
-      const districts = [...teacher.target_districts];
-      districts[index] = value;
-      setTeacher({ ...teacher, target_districts: districts });
-    }
+  const handleTargetChange = (index: number, field: "target_counties" | "target_districts", value: string) => {
+    const updatedTargets = [...formData[field]];
+    updatedTargets[index] = value;
+    
+    setFormData({ ...formData, [field]: updatedTargets });
   };
 
-  const addTargetLocation = () => {
-    setTeacher({
-      ...teacher,
-      target_counties: [...teacher.target_counties, ""],
-      target_districts: [...teacher.target_districts, ""]
+  const addTarget = () => {
+    setFormData({
+      ...formData,
+      target_counties: [...formData.target_counties, ""],
+      target_districts: [...formData.target_districts, ""]
     });
   };
 
-  const removeTargetLocation = (index: number) => {
-    // 不允許刪除最後一個志願
-    if (teacher.target_counties.length <= 1) return;
+  const removeTarget = (index: number) => {
+    const updatedCounties = [...formData.target_counties];
+    const updatedDistricts = [...formData.target_districts];
     
-    const newCounties = [...teacher.target_counties];
-    const newDistricts = [...teacher.target_districts];
+    updatedCounties.splice(index, 1);
+    updatedDistricts.splice(index, 1);
     
-    newCounties.splice(index, 1);
-    newDistricts.splice(index, 1);
-    
-    setTeacher({
-      ...teacher,
-      target_counties: newCounties,
-      target_districts: newDistricts
+    setFormData({
+      ...formData,
+      target_counties: updatedCounties,
+      target_districts: updatedDistricts
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    onSubmit(teacher);
-    setTeacher({
-      email: defaultEmail || "",
-      year: currentROCYear,
-      current_county: "",
-      current_district: "",
-      current_school: "",
-      target_counties: [""],
-      target_districts: [""]
-    });
+    
+    // Remove any empty target pairs
+    const cleanCounties = formData.target_counties.filter(county => county.trim() !== "");
+    const cleanDistricts = formData.target_districts.filter(district => district.trim() !== "");
+    
+    // Calculate the minimum length to avoid index out of bounds
+    const minLength = Math.min(cleanCounties.length, cleanDistricts.length);
+    
+    const submissionData = {
+      ...formData,
+      target_counties: cleanCounties.slice(0, minLength),
+      target_districts: cleanDistricts.slice(0, minLength)
+    };
+    
+    onSubmit(submissionData);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block' }}>介聘年度:</label>
-        <input
-          type="number"
-          name="year"
-          value={teacher.year}
-          onChange={handleChange}
-          required
-          style={{ width: '100%', padding: '5px' }}
-        />
-      </div>
-
-      <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block' }}>Email:</label>
+      <div style={{ marginBottom: "20px" }}>
+        <label htmlFor="email" style={{ display: "block", marginBottom: "5px" }}>
+          電子郵件
+        </label>
         <input
           type="email"
+          id="email"
           name="email"
-          value={teacher.email}
+          value={formData.email}
           onChange={handleChange}
+          style={{
+            width: "100%",
+            padding: "8px",
+            border: "1px solid #ddd",
+            borderRadius: "4px"
+          }}
           required
-          style={{ width: '100%', padding: '5px' }}
+        />
+        <small style={{ color: "#666", marginTop: "4px", display: "block" }}>
+          用於教師間聯絡，並顯示給配對成功的教師
+        </small>
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <label htmlFor="subject" style={{ display: "block", marginBottom: "5px" }}>
+          任教科目
+        </label>
+        <input
+          type="text"
+          id="subject"
+          name="subject"
+          value={formData.subject}
+          onChange={handleChange}
+          style={{
+            width: "100%",
+            padding: "8px",
+            border: "1px solid #ddd",
+            borderRadius: "4px"
+          }}
+          required
         />
       </div>
 
-      <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block' }}>目前縣/市:</label>
-        <input
-          type="text"
-          name="current_county"
-          value={teacher.current_county}
-          onChange={handleChange}
-          required
-          style={{ width: '100%', padding: '5px' }}
-        />
+      <h3 style={{ marginBottom: "15px" }}>現職學校</h3>
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <div style={{ flex: 1 }}>
+          <label htmlFor="current_county" style={{ display: "block", marginBottom: "5px" }}>
+            縣市
+          </label>
+          <input
+            type="text"
+            id="current_county"
+            name="current_county"
+            value={formData.current_county}
+            onChange={handleChange}
+            style={{
+              width: "100%",
+              padding: "8px",
+              border: "1px solid #ddd",
+              borderRadius: "4px"
+            }}
+            required
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <label htmlFor="current_district" style={{ display: "block", marginBottom: "5px" }}>
+            區
+          </label>
+          <input
+            type="text"
+            id="current_district"
+            name="current_district"
+            value={formData.current_district}
+            onChange={handleChange}
+            style={{
+              width: "100%",
+              padding: "8px",
+              border: "1px solid #ddd",
+              borderRadius: "4px"
+            }}
+            required
+          />
+        </div>
       </div>
 
-      <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block' }}>目前鄉鎮市/區:</label>
+      <div style={{ marginBottom: "20px" }}>
+        <label htmlFor="current_school" style={{ display: "block", marginBottom: "5px" }}>
+          學校名稱
+        </label>
         <input
           type="text"
-          name="current_district"
-          value={teacher.current_district}
-          onChange={handleChange}
-          required
-          style={{ width: '100%', padding: '5px' }}
-        />
-      </div>
-
-      <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block' }}>目前學校:</label>
-        <input
-          type="text"
+          id="current_school"
           name="current_school"
-          value={teacher.current_school}
+          value={formData.current_school}
           onChange={handleChange}
+          style={{
+            width: "100%",
+            padding: "8px",
+            border: "1px solid #ddd",
+            borderRadius: "4px"
+          }}
           required
-          style={{ width: '100%', padding: '5px' }}
         />
       </div>
 
-      <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block' }}>希望調往地區:</label>
-        {teacher.target_counties.map((county, index) => (
-          <div key={index} style={{ display: 'flex', marginBottom: '5px', alignItems: 'center' }}>
-            <span style={{ width: '20px', textAlign: 'right', marginRight: '5px' }}>{index + 1}.</span>
-            <input
-              type="text"
-              placeholder="縣/市"
-              value={county}
-              onChange={(e) => handleTargetChange(index, 'county', e.target.value)}
-              required
-              style={{ flex: 1, padding: '5px' }}
-            />
-            <input
-              type="text"
-              placeholder="鄉鎮市/區"
-              value={teacher.target_districts[index]}
-              onChange={(e) => handleTargetChange(index, 'district', e.target.value)}
-              required
-              style={{ flex: 1, marginLeft: '5px', padding: '5px' }}
-            />
-            {teacher.target_counties.length > 1 && (
-              <button 
-                type="button"
-                onClick={() => removeTargetLocation(index)}
+      <h3 style={{ marginBottom: "15px" }}>希望調往地區</h3>
+      {formData.target_counties.map((county, index) => (
+        <div key={index} style={{ marginBottom: "15px" }}>
+          <div style={{ display: "flex", gap: "10px", alignItems: "flex-end" }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: "block", marginBottom: "5px" }}>
+                縣市 {index + 1}
+              </label>
+              <input
+                type="text"
+                value={county}
+                onChange={(e) => handleTargetChange(index, "target_counties", e.target.value)}
                 style={{
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  marginLeft: '5px',
-                  padding: '0 5px',
-                  fontSize: '16px',
-                  color: '#dc3545'
+                  width: "100%",
+                  padding: "8px",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px"
                 }}
-                title="刪除此志願"
+                required
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: "block", marginBottom: "5px" }}>
+                區 {index + 1}
+              </label>
+              <input
+                type="text"
+                value={formData.target_districts[index] || ""}
+                onChange={(e) => handleTargetChange(index, "target_districts", e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px"
+                }}
+                required
+              />
+            </div>
+            {index > 0 && (
+              <button
+                type="button"
+                onClick={() => removeTarget(index)}
+                style={{
+                  padding: "8px 12px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer"
+                }}
               >
-                🗑️
+                移除
               </button>
             )}
           </div>
-        ))}
-        <button 
-          type="button" 
-          onClick={addTargetLocation}
-          style={{ padding: '5px', marginTop: '5px' }}
+        </div>
+      ))}
+
+      <div style={{ marginBottom: "30px" }}>
+        <button
+          type="button"
+          onClick={addTarget}
+          style={{
+            padding: "6px 12px",
+            backgroundColor: "#6c757d",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+          }}
         >
-          + 新增志願
+          + 新增希望調往的地區
         </button>
       </div>
 
-      <button 
-        type="submit"
-        style={{ 
-          backgroundColor: '#4CAF50', 
-          color: 'white',
-          border: 'none',
-          padding: '10px',
-          width: '100%',
-          cursor: 'pointer',
-          marginTop: '10px'
-        }}
-      >
-        提交資料
-      </button>
+      <div>
+        <button
+          type="submit"
+          style={{
+            padding: "10px 16px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontWeight: "bold",
+            width: "100%"
+          }}
+        >
+          送出介聘資料
+        </button>
+      </div>
     </form>
   );
-}
+};
+
+export default TeacherForm;
