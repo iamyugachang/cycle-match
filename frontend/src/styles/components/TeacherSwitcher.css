@@ -1,0 +1,46 @@
+.teacher-switcher {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f2f8ff;
+    border-radius: 5px;
+    border: 1px solid #c2e0ff;
+  }
+  
+  .teacher-switcher-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .teacher-switcher-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .teacher-button {
+    padding: 6px 12px;
+    background-color: #e9ecef;
+    color: #495057;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  
+  .teacher-button.active {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .teacher-switcher-buttons {
+      flex-direction: column;
+    }
+    
+    .teacher-button {
+      width: 100%;
+      text-align: left;
+    }
+  }

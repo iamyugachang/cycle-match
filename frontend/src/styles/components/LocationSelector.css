@@ -1,0 +1,73 @@
+.location-selector {
+    margin-bottom: 15px;
+  }
+  
+  .location-selector-horizontal {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .location-selector-vertical {
+    display: block;
+  }
+  
+  .county-selector {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .county-selector.vertical {
+    margin-bottom: 10px;
+  }
+  
+  .district-selector {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .location-selector label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .location-selector select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+  }
+  
+  .location-selector select:disabled {
+    background-color: #f5f5f5;
+  }
+  
+  .location-selector .loading {
+    display: block;
+    margin-top: 5px;
+    color: #6c757d;
+    font-size: 14px;
+  }
+  
+  .location-selector .error {
+    color: #dc3545;
+    margin-top: 5px;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .location-selector-horizontal {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .county-selector, .district-selector {
+      min-width: 100%;
+    }
+    
+    .location-selector select {
+      padding: 10px 8px;
+      font-size: 16px; /* Larger font on mobile for better readability */
+    }
+  }

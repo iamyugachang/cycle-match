@@ -24,7 +24,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   const currentYear = new Date().getFullYear() - 1911;
   
   return (
-    <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto", position: "relative" }}>
+    <main className="app-layout">
       {/* Debug Mode dropdown - left top corner */}
       <DebugDropdown 
         onViewAllMatches={onViewAllMatches} 
@@ -40,7 +40,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         />
       )}
 
-      <h1 style={{ textAlign: "center", marginBottom: "20px", marginTop: "40px" }}>
+      <h1 className="app-title">
         CircleMatch - 台灣 {currentYear} 年度小學教師介聘配對系統
       </h1>
 

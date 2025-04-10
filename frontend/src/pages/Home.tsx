@@ -9,6 +9,8 @@ import TeacherFormContainer from "../components/TeacherFormContainer";
 import MatchList from "../components/MatchList";
 import TeacherInfoModal from "../components/TeacherInfoModal";
 import TeacherSwitcher from "../components/TeacherSwitcher";
+import DebugModeToggle from "../components/DebugModeToggle";
+import PreviewSection from "../components/PreviewSection";
 import { Teacher } from "../types";
 
 export default function Home() {
@@ -163,34 +165,10 @@ export default function Home() {
             <>
               {/* Debug 模式下的用戶視角切換按鈕 */}
               {matchVM.isDebugMode && (
-                <div style={{
-                  marginBottom: "15px", 
-                  padding: "10px", 
-                  backgroundColor: "#f8f9fa", 
-                  borderRadius: "5px",
-                  border: "1px solid #ddd"
-                }}>
-                  <label style={{ 
-                    display: "flex", 
-                    alignItems: "center",
-                    justifyContent: "space-between" 
-                  }}>
-                    <span>Debug 模式: {matchVM.userView ? '用戶視角' : '所有配對'}</span>
-                    <button
-                      onClick={() => matchVM.toggleUserView()}
-                      style={{
-                        padding: "5px 10px",
-                        backgroundColor: matchVM.userView ? "#28a745" : "#007bff",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer"
-                      }}
-                    >
-                      {matchVM.userView ? "顯示所有配對" : "切換到用戶視角"}
-                    </button>
-                  </label>
-                </div>
+                <DebugModeToggle 
+                  userView={matchVM.userView}
+                  toggleUserView={matchVM.toggleUserView}
+                />
               )}
 
               {/* Teacher switcher */}
@@ -203,68 +181,11 @@ export default function Home() {
               )}
 
               {/* Preview Section */}
-              <div style={{
-                marginBottom: "15px",
-                padding: "10px",
-                backgroundColor: "#f2f8ff",
-                borderRadius: "5px",
-                border: "1px solid #c2e0ff"
-              }}>
-                {showPreview && userVM.currentTeacher && (
-                  <div style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px"
-                  }}>
-                    <div style={{
-                      padding: "10px",
-                      backgroundColor: "#ffffff",
-                      borderRadius: "5px",
-                      border: "1px solid #ddd"
-                    }}>
-                      <strong>現職地區 • 學校 • 科目：</strong> {userVM.currentTeacher.current_county} • {userVM.currentTeacher.current_district} • {userVM.currentTeacher.current_school} • {userVM.currentTeacher.subject}
-                    </div>
-                    <div style={{
-                      padding: "10px",
-                      backgroundColor: "#ffffff",
-                      borderRadius: "5px",
-                      border: "1px solid #ddd"
-                    }}>
-                      <strong>希望調往地區：</strong>
-                      <ul style={{
-                        listStyle: "none",
-                        padding: 0,
-                        margin: 0
-                      }}>
-                        {userVM.currentTeacher.target_counties.map((county, i) => (
-                          <li key={i} style={{
-                            padding: "5px 0",
-                            borderBottom: i < userVM.currentTeacher.target_counties.length - 1 ? "1px solid #ddd" : "none"
-                          }}>
-                            {i+1}. {county} • {userVM.currentTeacher.target_districts[i]}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  onClick={togglePreview}
-                  style={{
-                    marginTop: "10px",
-                    padding: "8px 16px",
-                    backgroundColor: "#007bff",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontSize: "14px"
-                  }}
-                >
-                  {showPreview ? "收合預覽" : "預覽已填表格"}
-                </button>
-              </div>
+              <PreviewSection
+                showPreview={showPreview}
+                teacher={userVM.currentTeacher}
+                togglePreview={togglePreview}
+              />
 
               {/* XX年度配對結果 */}
               <MatchList
