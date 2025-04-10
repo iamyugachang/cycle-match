@@ -10,6 +10,112 @@ interface MatchListProps {
   isDebugMode?: boolean;
 }
 
+interface MatchCardProps {
+  match: MatchResult;
+  currentTeacher: Teacher | null;
+  onShowTeacherInfo: (id: number | undefined, email: string) => void;
+  highlighted: boolean;
+}
+
+const MatchCard: React.FC<MatchCardProps> = ({ 
+  match, 
+  currentTeacher, 
+  onShowTeacherInfo,
+  highlighted 
+}) => {
+  const isCurrentUserInvolved = currentTeacher && 
+    match.teachers.some(teacher => teacher.id === currentTeacher.id);
+
+  return (
+    <li style={{ 
+      marginBottom: "15px", 
+      padding: "15px", 
+      border: highlighted ? "1px solid #007bff" : "1px solid #dee2e6",
+      borderRadius: "5px",
+      backgroundColor: isCurrentUserInvolved ? "#f0f7ff" : "white" 
+    }}>
+      <div style={{ fontWeight: "bold", marginBottom: "10px", fontSize: "1.1rem" }}>
+        {getMatchTypeName(match)}
+      </div>
+
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr style={{ backgroundColor: highlighted ? "#e6f2ff" : "#f5f5f5" }}>
+            <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>教師</th>
+            <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>現任學校</th>
+            <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>目標調往區域</th>
+            <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>任教科目</th>
+            <th style={{ padding: "8px", textAlign: "center", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6", width: "40px" }}>資訊</th>
+          </tr>
+        </thead>
+        <tbody>
+          {match.teachers.map((teacher, idx) => {
+            const nextTeacher = match.teachers[(idx + 1) % match.teachers.length];
+            const isCurrentUser = currentTeacher && teacher.id === currentTeacher.id;
+            
+            return (
+              <tr key={idx} style={{ 
+                backgroundColor: isCurrentUser ? "#e6f2ff" : "transparent" 
+              }}>
+                <td style={{ 
+                  padding: "8px", 
+                  border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6",
+                  fontWeight: isCurrentUser ? "bold" : "normal"
+                }}>
+                  {teacher.display_id || `${teacher.current_county}${teacher.current_district}#${teacher.id}`}
+                </td>
+                <td style={{ 
+                  padding: "8px", 
+                  border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6"
+                }}>
+                  {teacher.current_county} • {teacher.current_district} • {teacher.current_school}
+                </td>
+                <td style={{ 
+                  padding: "8px", 
+                  border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" 
+                }}>
+                  {nextTeacher.current_county} • {nextTeacher.current_district}
+                </td>
+                <td style={{ 
+                  padding: "8px", 
+                  border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" 
+                }}>
+                  {teacher.subject || "未指定"}
+                </td>
+                <td style={{ 
+                  padding: "8px", 
+                  textAlign: "center", 
+                  border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" 
+                }}>
+                  <button 
+                    onClick={() => onShowTeacherInfo(teacher.id, teacher.email)}
+                    style={{ 
+                      backgroundColor: highlighted ? "#007bff" : "#6c757d", 
+                      color: "white", 
+                      border: "none", 
+                      borderRadius: "50%",
+                      width: "24px", 
+                      height: "24px",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      padding: 0,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}
+                  >
+                    i
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </li>
+  );
+};
+
 const MatchList: React.FC<MatchListProps> = ({
   matches,
   currentTeacher,
@@ -118,114 +224,6 @@ const MatchList: React.FC<MatchListProps> = ({
         </div>
       )}
     </div>
-  );
-};
-
-interface MatchCardProps {
-  match: MatchResult;
-  currentTeacher: Teacher | null;
-  onShowTeacherInfo: (id: number | undefined, email: string) => void;
-  highlighted: boolean;
-}
-
-const MatchCard: React.FC<MatchCardProps> = ({ 
-  match, 
-  currentTeacher, 
-  onShowTeacherInfo,
-  highlighted 
-}) => {
-  const isCurrentUserInvolved = currentTeacher && 
-    match.teachers.some(teacher => teacher.id === currentTeacher.id);
-  
-  console.log("Match data before calling getMatchTypeName:", match);
-
-  return (
-    <li style={{ 
-      marginBottom: "15px", 
-      padding: "15px", 
-      border: highlighted ? "1px solid #007bff" : "1px solid #dee2e6",
-      borderRadius: "5px",
-      backgroundColor: isCurrentUserInvolved ? "#f0f7ff" : "white" 
-    }}>
-      <div style={{ fontWeight: "bold", marginBottom: "10px", fontSize: "1.1rem" }}>
-        {getMatchTypeName(match)}
-      </div>
-
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr style={{ backgroundColor: highlighted ? "#e6f2ff" : "#f5f5f5" }}>
-            <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>教師</th>
-            <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>現任學校</th>
-            <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>目標調往區域</th>
-            <th style={{ padding: "8px", textAlign: "left", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" }}>任教科目</th>
-            <th style={{ padding: "8px", textAlign: "center", border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6", width: "40px" }}>資訊</th>
-          </tr>
-        </thead>
-        <tbody>
-          {match.teachers.map((teacher, idx) => {
-            const nextTeacher = match.teachers[(idx + 1) % match.teachers.length];
-            const isCurrentUser = currentTeacher && teacher.id === currentTeacher.id;
-            
-            return (
-              <tr key={idx} style={{ 
-                backgroundColor: isCurrentUser ? "#e6f2ff" : "transparent" 
-              }}>
-                <td style={{ 
-                  padding: "8px", 
-                  border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6",
-                  fontWeight: isCurrentUser ? "bold" : "normal"
-                }}>
-                  {teacher.display_id || `${teacher.current_county}${teacher.current_district}#${teacher.id}`}
-                </td>
-                <td style={{ 
-                  padding: "8px", 
-                  border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6"
-                }}>
-                  {teacher.current_county} • {teacher.current_district} • {teacher.current_school}
-                </td>
-                <td style={{ 
-                  padding: "8px", 
-                  border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" 
-                }}>
-                  {nextTeacher.current_county} • {nextTeacher.current_district}
-                </td>
-                <td style={{ 
-                  padding: "8px", 
-                  border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" 
-                }}>
-                  {teacher.subject || "未指定"}
-                </td>
-                <td style={{ 
-                  padding: "8px", 
-                  textAlign: "center", 
-                  border: highlighted ? "1px solid #cce5ff" : "1px solid #dee2e6" 
-                }}>
-                  <button 
-                    onClick={() => onShowTeacherInfo(teacher.id, teacher.email)}
-                    style={{ 
-                      backgroundColor: highlighted ? "#007bff" : "#6c757d", 
-                      color: "white", 
-                      border: "none", 
-                      borderRadius: "50%",
-                      width: "24px", 
-                      height: "24px",
-                      cursor: "pointer",
-                      fontSize: "12px",
-                      padding: 0,
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center"
-                    }}
-                  >
-                    i
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </li>
   );
 };
 

@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, FormEvent } from "react";
 import { Teacher } from "../types";
 import LocationSelector from "./LocationSelector";
@@ -91,9 +89,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
       
       return newState;
     });
-    
-    // Don't try to access formData.current_county here, it won't be updated yet
-    // due to state updates being asynchronous
   };
 
   const handleCurrentDistrictChange = (district: string) => {
