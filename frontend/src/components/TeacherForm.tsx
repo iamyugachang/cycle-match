@@ -163,11 +163,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
     onSubmit(submissionData);
   };
 
-  // Add a useEffect to monitor county changes
-  useEffect(() => {
-    console.log("Current form data county:", formData.current_county);
-  }, [formData.current_county]);
-
   // Define responsive styles
   const formStyles = {
     container: { 

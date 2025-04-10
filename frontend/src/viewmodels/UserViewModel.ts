@@ -10,7 +10,6 @@ export const useUserViewModel = () => {
   const [error, setError] = useState("");
   
   const handleGoogleLoginSuccess = async (credentialResponse: any) => {
-    console.log("Google 登入成功:", credentialResponse);
     const token = credentialResponse.credential;
     setLoading(true);
     setError("");
