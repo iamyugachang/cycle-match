@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MatchResult, Teacher } from '../types';
-import { getMatchTypeName, isUserInvolved, sortMatches, getVisibleMatches } from '../utils/matchUtils';
+import { isUserInvolved, sortMatches, getVisibleMatches } from '../utils/matchUtils';
 
 export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: Teacher[] = []) => {
   const [matches, setMatches] = useState<MatchResult[]>([]);

@@ -14,5 +14,3 @@ export const fetchSubjects = async (): Promise<string[]> => {
     return ["一般", "英文", "體育", "音樂", "美術", "資訊", "特教", "行政"];
   }
 };
-
-// ...existing code...
