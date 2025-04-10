@@ -33,6 +33,28 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
 
   const [subjects, setSubjects] = useState<string[]>([]);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
+  
+  // Add state to track screen width for responsive design
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Check if we're on the client side before using window
+    if (typeof window !== 'undefined') {
+      // Set initial state
+      setIsMobile(window.innerWidth < 768);
+      
+      // Handler to update state based on window size
+      const handleResize = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      
+      // Add event listener
+      window.addEventListener('resize', handleResize);
+      
+      // Clean up
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   useEffect(() => {
     const loadSubjects = async () => {
@@ -151,63 +173,73 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
     console.log("Current form data county:", formData.current_county);
   }, [formData.current_county]);
 
-  // Define styles for reuse
+  // Define responsive styles
   const formStyles = {
     container: { 
       maxWidth: "100%", 
       margin: "0 auto",
-      padding: "0 10px" // Add padding to keep form contents away from edges
+      padding: isMobile ? "0 15px" : "0 20px" // Increased padding on mobile for better readability
     },
     formRow: { 
       display: "flex", 
+      flexDirection: isMobile ? "column" as "column" : "row" as "row", 
       flexWrap: "wrap" as "wrap", 
-      gap: "15px", 
-      marginBottom: "15px" 
+      gap: isMobile ? "10px" : "15px", 
+      marginBottom: isMobile ? "12px" : "15px" 
     },
-    formColumn: { flex: "1", minWidth: "250px" },
-    formGroup: { marginBottom: "12px" },
+    formColumn: { 
+      flex: "1", 
+      minWidth: isMobile ? "100%" : "250px" 
+    },
+    formGroup: { 
+      marginBottom: isMobile ? "16px" : "12px" 
+    },
     label: { 
       display: "block", 
-      marginBottom: "3px", 
-      fontSize: "14px",
+      marginBottom: "5px", 
+      fontSize: isMobile ? "16px" : "14px", // Larger font size on mobile
       fontWeight: "500" as "500"
     },
     input: {
       width: "100%",
-      padding: "8px",
+      padding: isMobile ? "12px 10px" : "8px", // Larger touch target on mobile
       border: "1px solid #ddd",
       borderRadius: "4px",
-      fontSize: "14px"
+      fontSize: isMobile ? "16px" : "14px", // Larger font on mobile for better readability
+      WebkitAppearance: "none", // Remove iOS default styling
+      appearance: "none"
     },
     inputReadOnly: {
       backgroundColor: "#f5f5f5"
     },
     helpText: { 
       color: "#666", 
-      fontSize: "12px", 
-      marginTop: "2px", 
+      fontSize: isMobile ? "14px" : "12px", // Larger on mobile
+      marginTop: "5px", 
       display: "block" 
     },
     section: { 
-      margin: "15px 0 10px 0", 
+      margin: "20px 0 15px 0", 
       borderBottom: "1px solid #eee", 
-      paddingBottom: "5px", 
-      fontWeight: "bold" as "bold" 
+      paddingBottom: "8px", 
+      fontWeight: "bold" as "bold",
+      fontSize: isMobile ? "18px" : "16px" // Larger headings on mobile
     },
     targetRow: {
-      marginBottom: "15px",
+      marginBottom: isMobile ? "20px" : "15px",
       position: "relative" as "relative",
-      padding: "10px",
+      padding: isMobile ? "15px 10px" : "10px",
       border: "1px solid #eaeaea",
       borderRadius: "4px",
       backgroundColor: "#fafafa"
     },
     button: {
-      padding: "8px 15px",
+      padding: isMobile ? "12px 16px" : "8px 15px", // Larger touch target on mobile
       border: "none",
       borderRadius: "4px",
       cursor: "pointer",
-      fontWeight: "500" as "500"
+      fontWeight: "500" as "500",
+      fontSize: isMobile ? "16px" : "14px" // Larger text on buttons for mobile
     },
     addButton: {
       backgroundColor: "#6c757d",
@@ -215,10 +247,11 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: "20px"
+      marginBottom: "20px",
+      width: isMobile ? "100%" : "auto" // Full width on mobile
     },
     removeButton: {
-      padding: "5px 10px",
+      padding: isMobile ? "8px 12px" : "5px 10px",
       backgroundColor: "#dc3545",
       color: "white",
       border: "none",
@@ -227,25 +260,26 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
       position: "absolute" as "absolute",
       right: "10px",
       top: "10px",
-      fontSize: "12px"
+      fontSize: isMobile ? "14px" : "12px" // Larger for touch targets
     },
     submitButton: {
       backgroundColor: "#007bff",
       color: "white",
-      padding: "10px 16px",
+      padding: isMobile ? "15px 16px" : "10px 16px", // Taller button on mobile
       width: "100%",
       fontWeight: "bold" as "bold",
-      marginTop: "10px"
+      marginTop: "20px",
+      fontSize: isMobile ? "18px" : "16px" // Larger text for mobile
     },
-    // Fixed: Added the correct syntax for locationRow
     locationRow: { 
       display: "flex", 
-      gap: "15px", 
+      flexDirection: isMobile ? "column" as "column" : "row" as "row",
+      gap: isMobile ? "12px" : "15px", 
       flexWrap: "wrap" as "wrap"
     },
     locationColumn: {
       flex: "1",
-      minWidth: "200px"
+      minWidth: isMobile ? "100%" : "200px"
     }
   };
 
@@ -264,14 +298,14 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
             onCountyChange={handleCurrentCountyChange}
             onDistrictChange={handleCurrentDistrictChange}
             required={true}
-            layout="horizontal"
+            layout={isMobile ? "vertical" : "horizontal"} // Change to vertical layout on mobile
             label={{
               county: "縣市",
               district: "區域"
             }}
           />
           {attemptedSubmit && (!formData.current_county || formData.current_county.trim() === "") && (
-            <p style={{ color: "red", marginTop: "3px", fontSize: "12px" }}>
+            <p style={{ color: "red", marginTop: "5px", fontSize: isMobile ? "14px" : "12px" }}>
               請選擇縣市
             </p>
           )}
@@ -284,19 +318,20 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
         </div>
       </div>
 
-      {/* Row 3: School Name and Subject - Make it match county/district layout exactly */}
+      {/* Row 3: School Name and Subject - Make it more responsive */}
       <div style={formStyles.formRow}>
         <div style={{...formStyles.formColumn, width: "100%"}}>
           {/* Replace with a more directly comparable approach */}
           <div style={{
             display: "flex",
-            gap: "30px", // Increased gap between school name and subject fields
+            flexDirection: isMobile ? "column" : "row", // Stack vertically on mobile
+            gap: isMobile ? "16px" : "30px", // Adjust spacing
             flexWrap: "wrap" as "wrap",
             width: "100%"  // Ensure full width like the LocationSelector
           }}>
             <div style={{
               flex: "1",
-              minWidth: "200px" // Same as locationColumn
+              minWidth: isMobile ? "100%" : "200px" // Full width on mobile
             }}>
               <label htmlFor="current_school" style={formStyles.label}>學校名稱</label>
               <input
@@ -313,7 +348,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
             
             <div style={{
               flex: "1",
-              minWidth: "200px" // Same as locationColumn
+              minWidth: isMobile ? "100%" : "200px" // Full width on mobile
             }}>
               <label htmlFor="subject" style={formStyles.label}>任教科目</label>
               <select
@@ -321,7 +356,10 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
-                style={formStyles.input}
+                style={{
+                  ...formStyles.input,
+                  height: isMobile ? "48px" : "auto" // Make sure select is tall enough on mobile
+                }}
                 required
                 disabled={loadingSubjects}
               >
@@ -352,7 +390,10 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
           className={index > 0 ? "target-row additional-row" : "target-row"}
         >
           <div>
-            <h4 style={{ margin: "0 0 5px 0", fontSize: "14px" }}>調動選項 {index + 1}</h4>
+            <h4 style={{ 
+              margin: "0 0 8px 0", 
+              fontSize: isMobile ? "16px" : "14px" 
+            }}>調動選項 {index + 1}</h4>
             
             {/* Use the LocationSelector directly instead of trying to create a custom select */}
             <LocationSelector
@@ -361,7 +402,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
               onCountyChange={(county) => handleTargetCountyChange(index, county)}
               onDistrictChange={(district) => handleTargetDistrictChange(index, district)}
               required={true}
-              layout="horizontal"
+              layout={isMobile ? "vertical" : "horizontal"} // Change to vertical layout on mobile
               label={{
                 county: `希望調往縣市`,
                 district: `希望調往區域`
@@ -373,7 +414,15 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
             <button
               type="button"
               onClick={() => removeTarget(index)}
-              style={formStyles.removeButton}
+              style={{
+                ...formStyles.removeButton,
+                // Position the button better on mobile
+                ...(isMobile && {
+                  top: "15px",
+                  right: "15px",
+                  padding: "10px 15px"
+                })
+              }}
             >
               移除
             </button>
