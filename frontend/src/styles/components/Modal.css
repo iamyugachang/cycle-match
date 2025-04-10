@@ -15,25 +15,41 @@
     background-color: white;
     padding: 20px;
     border-radius: 5px;
-    max-width: 500px;
-    width: 100%;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .modal-container.small {
+    max-width: 400px;
+  }
+  
+  .modal-container.medium {
+    max-width: 500px;
   }
   
   .modal-container.large {
     max-width: 600px;
     width: 80%;
-    max-height: 80vh;
-    overflow: auto;
   }
   
   .modal-header {
     margin-top: 0;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .modal-content {
+    margin-bottom: 20px;
   }
   
   .modal-footer {
     text-align: center;
     margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
   }
   
   .modal-close-btn {
@@ -43,7 +59,6 @@
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
-    margin-top: 10px;
   }
   
   .modal-close-btn.secondary {
@@ -53,10 +68,14 @@
   /* TeacherInfoModal specific styles */
   .teacher-info-item {
     margin-bottom: 10px;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
   }
   
   .teacher-info-label {
     font-weight: bold;
+    margin-right: 8px;
   }
   
   /* TeacherSelectionModal specific styles */

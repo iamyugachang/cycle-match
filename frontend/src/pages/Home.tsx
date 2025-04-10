@@ -8,36 +8,31 @@ import WelcomeBanner from "../components/WelcomeBanner";
 import TeacherFormContainer from "../components/TeacherFormContainer";
 import MatchList from "../components/MatchList";
 import TeacherInfoModal from "../components/TeacherInfoModal";
-import TeacherSwitcher from "../components/TeacherSwitcher";
-import DebugModeToggle from "../components/DebugModeToggle";
-import PreviewSection from "../components/PreviewSection";
+import { DebugControls, TeacherSwitcher, PreviewSection } from "../components/ControlPanel";
 import { Teacher } from "../types";
 
 export default function Home() {
   // UI state
   const [showResults, setShowResults] = useState(false);
   const [showForm, setShowForm] = useState(true);
-
-  // State for preview
   const [showPreview, setShowPreview] = useState(false);
-  const [selectedFormIndex, setSelectedFormIndex] = useState(0);
 
   // Initialize view models
   const userVM = useUserViewModel();
   const matchVM = useMatchViewModel(userVM.currentTeacher, userVM.allTeachers);
   
-  // Function to handle teacher form submission
+  // Handle teacher form submission
   const handleCreateTeacher = async (teacher: Teacher) => {
     try {
       const createdTeacher = await matchVM.createTeacher(teacher, userVM.userInfo?.google_id);
       
-      // 添加新教師到所有教師列表中
-      const updatedTeachers = [...userVM.allTeachers, createdTeacher];
-      userVM.setAllTeachers(updatedTeachers);
+      // Add new teacher to all teachers list
+      userVM.setAllTeachers([...userVM.allTeachers, createdTeacher]);
       
-      // 設置當前教師為新創建的教師
+      // Set current teacher to the newly created one
       userVM.setCurrentTeacher(createdTeacher);
       
+      // Show match results
       setShowResults(true);
       setShowForm(false);
     } catch (error) {
@@ -45,20 +40,20 @@ export default function Home() {
     }
   };
 
-  // Function to handle the "back to form" button
+  // Handle back to form button
   const handleBackToForm = () => {
     setShowResults(false);
     setShowForm(true);
   };
 
-  // View all matches in debug mode
+  // Debug: View all matches
   const handleViewAllMatches = async () => {
     matchVM.enableDebugMode();
     await matchVM.fetchMatches();
     setShowResults(true);
     setShowForm(false);
     
-    // If user is not logged in, create a minimal debug session
+    // Create minimal debug session if user not logged in
     if (!userVM.userInfo) {
       userVM.setUserInfo({
         name: "Debug Viewer",
@@ -69,7 +64,7 @@ export default function Home() {
     }
   };
 
-  // Debug login function
+  // Debug: Login with specified ID
   const handleDebugLogin = async () => {
     const googleId = prompt("請輸入模擬的 Google ID (email):", "test@example.com");
     
@@ -78,7 +73,7 @@ export default function Home() {
         const result = await userVM.debugLogin(googleId);
         
         if (result?.teachers?.length > 0) {
-          // Teacher data was found, show matches
+          // Teacher data found, show matches
           matchVM.fetchMatches();
           setShowResults(true);
           setShowForm(false);
@@ -88,12 +83,12 @@ export default function Home() {
           setShowResults(false);
         }
       } catch (error) {
-        // Error is handled in the view model
+        // Error handled in view model
       }
     }
   };
 
-  // Show results after successful login if teacher already exists
+  // Handle Google login success
   const handleLoginSuccess = async (credentialResponse: any) => {
     try {
       const result = await userVM.handleGoogleLoginSuccess(credentialResponse);
@@ -107,7 +102,7 @@ export default function Home() {
         setShowResults(false);
       }
     } catch (error) {
-      // Error is handled in the view model
+      // Error handled in view model
     }
   };
 
@@ -118,21 +113,18 @@ export default function Home() {
     setShowForm(false);
   };
 
-  // 切換當前選中的教師
+  // Switch between multiple teacher records
   const handleSwitchTeacher = (teacherId: number) => {
     if (userVM.switchTeacher(teacherId)) {
-      // 刷新匹配結果
-      matchVM.fetchMatches(); // Ensure matches are recalculated
-      setShowResults(true); // Ensure results are displayed
-      setShowForm(false); // Hide the form
+      // Refresh matches
+      matchVM.fetchMatches();
+      setShowResults(true);
+      setShowForm(false);
     }
   };
 
   // Toggle preview visibility
   const togglePreview = () => setShowPreview(!showPreview);
-
-  // Handle form switching
-  const handleFormSwitch = (index: number) => setSelectedFormIndex(index);
 
   return (
     <AppLayout 
@@ -163,15 +155,16 @@ export default function Home() {
           {/* Match results display */}
           {showResults && (
             <>
-              {/* Debug 模式下的用戶視角切換按鈕 */}
-              {matchVM.isDebugMode && (
-                <DebugModeToggle 
-                  userView={matchVM.userView}
-                  toggleUserView={matchVM.toggleUserView}
-                />
-              )}
+              {/* Debug mode controls */}
+              <DebugControls 
+                isDebugMode={matchVM.isDebugMode}
+                userView={matchVM.userView}
+                toggleUserView={matchVM.toggleUserView}
+                onViewAllMatches={handleViewAllMatches}
+                onDebugLogin={handleDebugLogin}
+              />
 
-              {/* Teacher switcher */}
+              {/* Teacher switcher - only visible with multiple teacher records */}
               {userVM.allTeachers.length > 1 && (
                 <TeacherSwitcher 
                   teachers={userVM.allTeachers} 
@@ -180,14 +173,14 @@ export default function Home() {
                 />
               )}
 
-              {/* Preview Section */}
+              {/* Preview Section - show current teacher data */}
               <PreviewSection
                 showPreview={showPreview}
                 teacher={userVM.currentTeacher}
                 togglePreview={togglePreview}
               />
 
-              {/* XX年度配對結果 */}
+              {/* Match results list */}
               <MatchList
                 matches={matchVM.getFilteredMatches()}
                 currentTeacher={userVM.currentTeacher}
@@ -206,6 +199,7 @@ export default function Home() {
               email={matchVM.teacherInfo.email}
               matches={matchVM.matches}
               onClose={matchVM.closeTeacherInfo}
+              isOpen={matchVM.teacherInfo.isOpen || false}
             />
           )}
         </>

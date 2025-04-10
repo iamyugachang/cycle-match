@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { MatchResult, Teacher } from '../types';
 import { isUserInvolved, sortMatches, getVisibleMatches } from '../utils/matchUtils';
+import ApiService from '../services/ApiService';
 
 export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: Teacher[] = []) => {
   const [matches, setMatches] = useState<MatchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isDebugMode, setIsDebugMode] = useState(false);
-  const [userView, setUserView] = useState(false); // 用於在 debug 模式下模擬使用者視角
-  const [teacherInfo, setTeacherInfo] = useState<{id: number | undefined, email: string} | null>(null);
+  const [userView, setUserView] = useState(false);
+  const [teacherInfo, setTeacherInfo] = useState<{id: number | undefined, email: string, isOpen: boolean} | null>(null);
   
-  // 取得當前民國年度
+  // Get current Taiwanese year
   const currentYear = new Date().getFullYear() - 1911;
 
   // Fetch matches data from API
@@ -19,27 +20,18 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
     setError("");
     
     try {
-      const matchResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/matches`
-      );
+      const matchData = await ApiService.getMatches();
       
-      if (!matchResponse.ok) {
-        throw new Error(`配對結果獲取失敗: ${matchResponse.status}`);
-      }
-
-      const matchData = await matchResponse.json();
-      
-      // 篩選出當前年度的配對結果
+      // Filter for current year matches
       const currentYearMatches = matchData.filter((match: MatchResult) => {
-        // 只要配對中有一位老師是當前年度的，就顯示此配對
         return match.teachers.some(teacher => teacher.year === currentYear);
       });
       
       setMatches(currentYearMatches);
       return currentYearMatches;
     } catch (err) {
-      console.error("資料獲取錯誤:", err);
-      setError(err instanceof Error ? err.message : "未知錯誤");
+      const errorMessage = err instanceof Error ? err.message : "未知錯誤";
+      setError(errorMessage);
       return [];
     } finally {
       setLoading(false);
@@ -56,69 +48,51 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
     setError("");
     
     try {
-      // 確保將 `google_id` 包含在發送的資料中
-      const teacherWithGoogleId = {
+      // Ensure we include google_id and current year
+      const teacherWithMetadata = {
         ...teacher,
         google_id: googleId,
-        year: currentYear, // 確保設定當前年度
+        year: currentYear,
       };
   
-      console.log("發送到後端的資料:", JSON.stringify(teacherWithGoogleId, null, 2));
-  
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/teachers`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(teacherWithGoogleId),
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API 錯誤回應:", response.status, errorText);
-        throw new Error(`後端錯誤: ${response.status} ${response.statusText} - ${errorText}`);
-      }
-  
-      // 儲存創建的教師資料
-      const createdTeacher = await response.json();
-      console.log("從後端收到的回應:", createdTeacher);
+      const createdTeacher = await ApiService.createTeacher(teacherWithMetadata);
       
-      // 獲取配對結果
+      // Fetch updated matches
       await fetchMatches();
       
       return createdTeacher;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "操作失敗，請稍後再試");
-      console.error(err);
+      const errorMessage = err instanceof Error ? err.message : "操作失敗，請稍後再試";
+      setError(errorMessage);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  // 獲取與用戶所有教師相關的配對
+  // Get filtered matches based on current mode and user
   const getFilteredMatches = () => {
-    // 先過濾出當前年度的配對
+    // Filter matches for current year
     const yearMatches = matches.filter(match => 
       match.teachers.some(teacher => teacher.year === currentYear)
     );
     
-    // 如果是 debug 模式但啟用了用戶視角，只顯示與當前選擇的教師相關的配對
+    // If debug mode with user view enabled, show only matches for current teacher
     if (isDebugMode && userView) {
       return getVisibleMatches(yearMatches, false, currentTeacher);
     }
     
-    // Debug 模式顯示所有配對
+    // Debug mode shows all matches
     if (isDebugMode) {
       return yearMatches;
     }
     
-    // 正常模式：顯示與用戶所有教師相關的配對
+    // Normal mode: show matches involving any of the user's teachers
     if (allTeachers.length === 0) {
       return [];
     }
     
-    // 過濾出與用戶任何一個教師相關的配對
+    // Filter matches involving any of the user's teachers
     return yearMatches.filter(match => 
       allTeachers.some(teacher => isUserInvolved(match, teacher))
     );
@@ -131,14 +105,16 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
 
   // Teacher info display management
   const showTeacherInfo = (id: number | undefined, email: string) => {
-    setTeacherInfo({ id, email });
+    setTeacherInfo({ id, email, isOpen: true });
   };
 
   const closeTeacherInfo = () => {
-    setTeacherInfo(null);
+    if (teacherInfo) {
+      setTeacherInfo({ ...teacherInfo, isOpen: false });
+    }
   };
 
-  // Debug 模式與用戶視角切換
+  // Debug mode and user view toggle
   const enableDebugMode = () => {
     setIsDebugMode(true);
     setUserView(false);
@@ -149,17 +125,17 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
     setUserView(false);
   };
   
-  // 在 debug 模式下切換到用戶視角
+  // Toggle user view in debug mode
   const toggleUserView = () => {
     if (isDebugMode) {
       setUserView(!userView);
     }
   };
 
-  // 檢查是否在 debug 模式下使用用戶視角
+  // Check if in user view mode
   const isUserViewActive = () => isDebugMode && userView;
   
-  // 獲取顯示模式的標題
+  // Get title based on current view mode
   const getViewModeTitle = () => {
     if (!isDebugMode) return `${currentYear}年度配對結果`;
     if (userView) return `${currentYear}年度配對結果 (用戶視角)`;

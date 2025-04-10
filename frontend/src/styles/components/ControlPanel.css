@@ -1,0 +1,191 @@
+/* Debug Container and Dropdown Styles */
+.debug-container {
+    margin-bottom: 15px;
+  }
+  
+  .debug-dropdown {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 100;
+  }
+  
+  .debug-button {
+    padding: 5px 10px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #666;
+    width: 60px;
+  }
+  
+  .debug-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    width: 150px;
+    margin-top: 2px;
+  }
+  
+  .debug-menu-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .debug-menu-item:last-child {
+    border-bottom: none;
+  }
+  
+  .debug-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+  
+  /* Debug Mode Toggle */
+  .debug-mode-control {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  .debug-mode-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .toggle-view-button {
+    padding: 5px 10px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .toggle-view-button.user-view {
+    background-color: #28a745;
+  }
+  
+  .toggle-view-button.all-view {
+    background-color: #007bff;
+  }
+  
+  /* Teacher Switcher Styles */
+  .teacher-switcher {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f2f8ff;
+    border-radius: 5px;
+    border: 1px solid #c2e0ff;
+  }
+  
+  .teacher-switcher-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .teacher-switcher-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .teacher-button {
+    padding: 6px 12px;
+    background-color: #e9ecef;
+    color: #495057;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  
+  .teacher-button.active {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  /* Preview Section Styles */
+  .preview-section {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f2f8ff;
+    border-radius: 5px;
+    border: 1px solid #c2e0ff;
+  }
+  
+  .preview-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .preview-item {
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  .preview-button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .preview-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .preview-list-item {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .preview-list-item:last-child {
+    border-bottom: none;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .teacher-switcher-buttons {
+      flex-direction: column;
+    }
+    
+    .teacher-button {
+      width: 100%;
+      text-align: left;
+    }
+    
+    .debug-mode-label {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    
+    .toggle-view-button {
+      width: 100%;
+    }
+  }
