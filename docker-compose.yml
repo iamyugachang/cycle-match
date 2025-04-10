@@ -17,6 +17,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - circlematch-network
 
   backend:
     build: 
@@ -32,6 +34,9 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     depends_on:
       - db
+    networks:
+      - circlematch-network
+    restart: unless-stopped
 
   frontend:
     build: 
@@ -42,10 +47,20 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
-      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      VITE_API_URL: http://localhost:8000
+      VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
+    networks:
+      - circlematch-network
+    restart: unless-stopped
+
+networks:
+  circlematch-network:
+    driver: bridge
 
 volumes:
   postgres_data:

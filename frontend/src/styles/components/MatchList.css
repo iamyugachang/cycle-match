@@ -1,0 +1,144 @@
+.match-container {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .match-title {
+    margin: 0;
+  }
+  
+  .back-button {
+    padding: 8px 16px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .match-empty {
+    text-align: center;
+    padding: 20px 0;
+  }
+  
+  .user-matches-section {
+    margin-bottom: 30px;
+  }
+  
+  .user-matches-title {
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+  }
+  
+  .all-matches-section {
+    margin-top: 30px;
+  }
+  
+  .all-matches-title {
+    border-bottom: 2px solid #6c757d;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+  }
+  
+  .match-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  /* Match Card Styles */
+  .match-card {
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: white;
+  }
+  
+  .match-card.highlighted {
+    border-color: #007bff;
+    background-color: #f0f7ff;
+  }
+  
+  .match-card-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+  }
+  
+  .match-card-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .match-card-table th {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #dee2e6;
+    background-color: #f5f5f5;
+  }
+  
+  .match-card-table.highlighted th {
+    border-color: #cce5ff;
+    background-color: #e6f2ff;
+  }
+  
+  .match-card-table td {
+    padding: 8px;
+    border: 1px solid #dee2e6;
+  }
+  
+  .match-card-table.highlighted td {
+    border-color: #cce5ff;
+  }
+  
+  .current-user-row {
+    background-color: #e6f2ff;
+  }
+  
+  .current-user-cell {
+    font-weight: bold;
+  }
+  
+  .info-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .info-button.highlighted {
+    background-color: #007bff;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .match-card {
+      padding: 10px;
+    }
+    
+    .match-card-table {
+      font-size: 14px;
+    }
+    
+    .match-card-table th,
+    .match-card-table td {
+      padding: 6px 4px;
+    }
+  }

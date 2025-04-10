@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Teacher, UserInfo, UserResponse } from '../types';
 
 export const useUserViewModel = () => {
@@ -16,7 +16,7 @@ export const useUserViewModel = () => {
   
     try {
       // 將 Google Token 傳送到後端進行驗證
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/google-login`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/google-login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +111,7 @@ export const useUserViewModel = () => {
     try {
       // 嘗試獲取此 Google ID 的教師資料
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/teachers?google_id=${encodeURIComponent(googleId)}`,
+        `${import.meta.env.VITE_API_URL}/api/teachers?google_id=${encodeURIComponent(googleId)}`,
         { method: "GET" }
       );
       

@@ -33,7 +33,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   
-  // Define a ref to track first render - fixed to use the imported useRef
+  // Define a ref to track first render
   const isFirstRender = useRef(true);
   
   // Fetch location data on component mount

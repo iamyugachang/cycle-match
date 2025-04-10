@@ -20,7 +20,7 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
     
     try {
       const matchResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/matches`
+        `${import.meta.env.VITE_API_URL}/api/matches`
       );
       
       if (!matchResponse.ok) {
@@ -65,7 +65,7 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
   
       console.log("發送到後端的資料:", JSON.stringify(teacherWithGoogleId, null, 2));
   
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/teachers`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/teachers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

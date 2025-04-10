@@ -3,3 +3,6 @@ export * from './matchUtils';
 
 // Export location utilities
 export * from './locationUtils';
+
+// Export subject utilities
+export * from './subjectUtils';

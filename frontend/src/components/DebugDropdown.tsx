@@ -12,7 +12,7 @@ const DebugDropdown: React.FC<DebugDropdownProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleMouseEnter = () => {
     // Clear any existing timeout to prevent the dropdown from closing
@@ -24,7 +24,7 @@ const DebugDropdown: React.FC<DebugDropdownProps> = ({
   };
 
   const handleMouseLeave = () => {
-    // Set a longer timeout (500ms) to give user time to move to the dropdown
+    // Set a timeout to give user time to move to the dropdown
     timeoutRef.current = setTimeout(() => {
       setShowDropdown(false);
     }, 150);
@@ -42,28 +42,12 @@ const DebugDropdown: React.FC<DebugDropdownProps> = ({
   return (
     <div 
       ref={containerRef}
-      style={{
-        position: "absolute",
-        top: "10px",
-        left: "10px",
-        zIndex: 100
-      }}
+      className="debug-dropdown"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Debug button */}
-      <button
-        style={{
-          padding: "5px 10px",
-          background: "#f5f5f5",
-          border: "1px solid #ddd",
-          borderRadius: "4px",
-          cursor: "pointer",
-          fontSize: "12px",
-          color: "#666",
-          width: "60px"  // Fixed width to prevent layout shifts
-        }}
-      >
+      <button className="debug-button">
         Debug
       </button>
 
@@ -71,35 +55,16 @@ const DebugDropdown: React.FC<DebugDropdownProps> = ({
       {showDropdown && (
         <div
           ref={dropdownRef}
-          onMouseEnter={handleMouseEnter} // Also prevent closing when hovering the dropdown
+          className="debug-menu"
+          onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          style={{
-            position: "absolute",
-            top: "100%",
-            left: "0",
-            backgroundColor: "white",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-            width: "150px",
-            marginTop: "2px" // Small gap between button and dropdown
-          }}
         >
           <button
             onClick={() => {
               onViewAllMatches();
               setShowDropdown(false);
             }}
-            style={{
-              display: "block",
-              width: "100%",
-              textAlign: "left",
-              padding: "10px",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              borderBottom: "1px solid #eee"
-            }}
+            className="debug-menu-item"
           >
             顯示所有配對
           </button>
@@ -108,15 +73,7 @@ const DebugDropdown: React.FC<DebugDropdownProps> = ({
               onDebugLogin();
               setShowDropdown(false);
             }}
-            style={{
-              display: "block",
-              width: "100%",
-              textAlign: "left",
-              padding: "10px",
-              background: "none",
-              border: "none",
-              cursor: "pointer"
-            }}
+            className="debug-menu-item"
           >
             模擬登入
           </button>
