@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import '../styles/components/Modal.css';
+import { Modal as AntModal, Button } from 'antd';
 
 interface ModalProps {
   isOpen: boolean;
@@ -20,32 +20,32 @@ const Modal: React.FC<ModalProps> = ({
   footer,
   closeButtonText = '關閉'
 }) => {
-  if (!isOpen) return null;
+  // Map our size props to width values
+  const widthMap = {
+    small: 400,
+    medium: 520,
+    large: 720
+  };
 
   return (
-    <div className="modal-overlay" onClick={(e) => {
-      // Close when clicking the overlay (outside the modal)
-      if (e.target === e.currentTarget) onClose();
-    }}>
-      <div className={`modal-container ${size}`} onClick={(e) => e.stopPropagation()}>
-        <h3 className="modal-header">{title}</h3>
-        
-        <div className="modal-content">
-          {children}
-        </div>
-        
-        <div className="modal-footer">
-          {footer || (
-            <button 
-              onClick={onClose}
-              className="modal-close-btn"
-            >
-              {closeButtonText}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+    <AntModal
+      open={isOpen}
+      title={title}
+      onCancel={onClose}
+      width={widthMap[size]}
+      centered
+      footer={footer || [
+        <Button 
+          key="close" 
+          onClick={onClose} 
+          type="primary"
+        >
+          {closeButtonText}
+        </Button>
+      ]}
+    >
+      {children}
+    </AntModal>
   );
 };
 

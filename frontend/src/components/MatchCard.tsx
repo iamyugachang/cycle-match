@@ -1,11 +1,14 @@
 import React from "react";
+import { Card, Tag, Space, Typography } from "antd";
 import { MatchResult, Teacher } from "../types";
 import { getMatchTypeName, isUserInvolved } from "../utils/matchUtils";
+
+const { Text } = Typography;
 
 interface MatchCardProps {
   match: MatchResult;
   currentTeacher: Teacher | null;
-  showDetailedView?: boolean; // 新增參數，用於控制是否顯示詳細視圖
+  showDetailedView?: boolean;
 }
 
 const MatchCard: React.FC<MatchCardProps> = ({ 
@@ -16,40 +19,46 @@ const MatchCard: React.FC<MatchCardProps> = ({
   const isInvolved = isUserInvolved(match, currentTeacher);
   
   return (
-    <div className={`match-card ${isInvolved ? 'highlighted' : ''}`}>
-      <div className="match-card-container">
-        <div className="match-type-column">
-          <div className="match-type-title">
-            {getMatchTypeName(match)}
-          </div>
+    <Card
+      className={isInvolved ? 'highlighted-card' : ''}
+      style={{ 
+        marginBottom: 16, 
+        borderColor: isInvolved ? '#3b82f6' : '#d1d5db',
+        backgroundColor: isInvolved ? '#eff6ff' : 'white'
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ flex: '0 0 33%' }}>
+          <Text strong>{getMatchTypeName(match)}</Text>
           {isInvolved && (
-            <div className="match-involvement-tag">
-              您參與的配對
+            <div style={{ marginTop: 4 }}>
+              <Tag color="blue">您參與的配對</Tag>
             </div>
           )}
         </div>
         
-        <div className="match-teachers-column">
-          <div className="teachers-list">
+        <div style={{ flex: '0 0 67%' }}>
+          <Space wrap style={{ display: 'flex', justifyContent: 'flex-end' }}>
             {match.teachers.map((teacher, index) => (
-              <div
-                key={teacher.id}
-                className={`teacher-tag ${teacher.id === currentTeacher?.id ? 'current-teacher' : ''}`}
-              >
-                {teacher.name || teacher.email}
-                {index < match.teachers.length - 1 && " →"}
-              </div>
+              <React.Fragment key={teacher.id}>
+                <Tag color={teacher.id === currentTeacher?.id ? 'blue' : 'default'}>
+                  {teacher.name || teacher.email}
+                </Tag>
+                {index < match.teachers.length - 1 && <Text type="secondary">→</Text>}
+              </React.Fragment>
             ))}
-          </div>
+          </Space>
           
           {showDetailedView && match.createdAt && (
-            <div className="match-creation-time">
-              建立於: {new Date(match.createdAt).toLocaleString()}
+            <div style={{ marginTop: 8, textAlign: 'right' }}>
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                建立於: {new Date(match.createdAt).toLocaleString()}
+              </Text>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

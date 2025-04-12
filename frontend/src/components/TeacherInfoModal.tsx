@@ -1,3 +1,4 @@
+import { Descriptions } from "antd";
 import { MatchResult } from "../types";
 import Modal from "./Modal";
 
@@ -6,7 +7,7 @@ interface TeacherInfoModalProps {
   email: string;
   matches: MatchResult[];
   onClose: () => void;
-  isOpen: boolean; // Added to match Modal component expectations
+  isOpen: boolean;
 }
 
 const TeacherInfoModal: React.FC<TeacherInfoModalProps> = ({ 
@@ -28,12 +29,10 @@ const TeacherInfoModal: React.FC<TeacherInfoModalProps> = ({
       title="教師聯絡資訊"
       size="small"
     >
-      <div className="teacher-info-item">
-        <span className="teacher-info-label">代號:</span> {displayId}
-      </div>
-      <div className="teacher-info-item">
-        <span className="teacher-info-label">Email:</span> {email}
-      </div>
+      <Descriptions bordered column={1}>
+        <Descriptions.Item label="代號">{displayId}</Descriptions.Item>
+        <Descriptions.Item label="Email">{email}</Descriptions.Item>
+      </Descriptions>
     </Modal>
   );
 };

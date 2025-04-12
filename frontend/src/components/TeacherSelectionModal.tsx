@@ -1,11 +1,15 @@
+import { List, Button, Typography } from "antd";
+import { RightOutlined } from '@ant-design/icons';
 import { Teacher } from "../types";
 import Modal from "./Modal";
+
+const { Text } = Typography;
 
 interface TeacherSelectionModalProps {
   teachers: Teacher[];
   onSelectTeacher: (teacherId: number | undefined) => void;
   onClose: () => void;
-  isOpen: boolean; // Added to match Modal component expectations
+  isOpen: boolean;
 }
 
 const TeacherSelectionModal: React.FC<TeacherSelectionModalProps> = ({ 
@@ -22,32 +26,31 @@ const TeacherSelectionModal: React.FC<TeacherSelectionModalProps> = ({
       size="large"
       closeButtonText="返回"
     >
-      <ul className="teacher-selection-list">
-        {teachers.map((teacher) => (
-          <li 
-            key={teacher.id} 
+      <List
+        dataSource={teachers}
+        renderItem={(teacher) => (
+          <List.Item 
+            key={teacher.id}
             onClick={() => onSelectTeacher(teacher.id)}
-            className="teacher-selection-item"
+            style={{ cursor: 'pointer' }}
+            actions={[
+              <Button type="primary" size="small" onClick={(e) => {
+                e.stopPropagation();
+                onSelectTeacher(teacher.id);
+              }}>
+                選擇此筆
+              </Button>
+            ]}
           >
-            <div className="teacher-selection-icon">
-              <i className="fas fa-school"></i>
-            </div>
-            <div className="teacher-selection-content">
-              <div className="teacher-selection-title">
-                {teacher.current_county} • {teacher.current_district} • {teacher.current_school} • {teacher.subject || '未指定科目'}
-              </div>
-              <div className="teacher-selection-subtitle">
-                希望調往: {teacher.target_counties.map((county, i) => 
-                  `${county} | ${teacher.target_districts[i] || ''}`
-                ).join(', ')}
-              </div>
-            </div>
-            <div className="teacher-selection-action">
-              選擇此筆
-            </div>
-          </li>
-        ))}
-      </ul>
+            <List.Item.Meta
+              title={`${teacher.current_county} • ${teacher.current_district} • ${teacher.current_school} • ${teacher.subject || '未指定科目'}`}
+              description={`希望調往: ${teacher.target_counties.map((county, i) => 
+                `${county} | ${teacher.target_districts[i] || ''}`
+              ).join(', ')}`}
+            />
+          </List.Item>
+        )}
+      />
     </Modal>
   );
 };

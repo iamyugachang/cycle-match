@@ -1,15 +1,28 @@
-import { Routes, Route } from 'react-router-dom'
-import { GoogleOAuthProvider } from '@react-oauth/google'
-import HomePage from './pages/Home'
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import Home from './pages/Home';
 
-function App() {
+// Add any other imports for additional pages/components here
+
+const App: React.FC = () => {
+  // You can replace this with your actual Google client ID from your environment variables
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ""}>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-      </Routes>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          {/* Add additional routes as needed */}
+          {/* Example:
+          <Route path="/about" element={<About />} />
+          <Route path="/profile" element={<Profile />} /> 
+          */}
+        </Routes>
+      </BrowserRouter>
     </GoogleOAuthProvider>
-  )
-}
+  );
+};
 
-export default App
+export default App;
