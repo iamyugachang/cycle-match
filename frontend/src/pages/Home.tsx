@@ -11,6 +11,7 @@ import TeacherInfoModal from "../components/TeacherInfoModal";
 import { DebugControls, TeacherSwitcher, PreviewSection } from "../components/ControlPanel";
 import TeacherProfilePage from "../components/TeacherProfilePage";
 import { Teacher } from "../types";
+import AnnouncementBanner from '../components/AnnouncementBanner';
 
 export default function Home() {
   // UI state
@@ -203,33 +204,40 @@ export default function Home() {
         <>
           {/* Teacher registration form */}
           {showForm && (
-            <TeacherFormContainer
-              onSubmit={handleCreateTeacher}
-              defaultEmail={userVM.userInfo.email}
-              loading={matchVM.loading || userVM.loading}
-              error={matchVM.error || userVM.error}
-            />
+            <>
+              <AnnouncementBanner />
+              <TeacherFormContainer
+                onSubmit={handleCreateTeacher}
+                defaultEmail={userVM.userInfo.email}
+                loading={matchVM.loading || userVM.loading}
+                error={matchVM.error || userVM.error}
+              />
+            </>
           )}
 
           {/* Teacher Profile Page */}
           {showProfile && (
-            <TeacherProfilePage
-              teachers={userVM.allTeachers}
-              currentTeacherId={userVM.currentTeacher?.id}
-              editingTeacher={userVM.editingTeacher}
-              loading={userVM.loading}
-              error={userVM.error}
-              onEditTeacher={handleEditTeacher}
-              onDeleteTeacher={handleDeleteTeacher}
-              onUpdateTeacher={handleUpdateTeacher}
-              onCancelEdit={userVM.cancelEditingTeacher}
-              onShowResults={handleShowResults}
-            />
+            <>
+              <AnnouncementBanner />
+              <TeacherProfilePage
+                teachers={userVM.allTeachers}
+                currentTeacherId={userVM.currentTeacher?.id}
+                editingTeacher={userVM.editingTeacher}
+                loading={userVM.loading}
+                error={userVM.error}
+                onEditTeacher={handleEditTeacher}
+                onDeleteTeacher={handleDeleteTeacher}
+                onUpdateTeacher={handleUpdateTeacher}
+                onCancelEdit={userVM.cancelEditingTeacher}
+                onShowResults={handleShowResults}
+              />
+            </>  
           )}
 
           {/* Match results display */}
           {showResults && (
             <>
+              <AnnouncementBanner />
               {/* Debug mode controls */}
               <DebugControls 
                 isDebugMode={matchVM.isDebugMode}
