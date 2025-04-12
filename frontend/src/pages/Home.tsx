@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Layout, Typography, Space, ConfigProvider, theme } from 'antd';
 import { useUserViewModel } from '../viewmodels/UserViewModel';
 import { useMatchViewModel } from '../viewmodels/MatchViewModel';
+import { MailOutlined, LinkedinOutlined } from '@ant-design/icons';
 
 // Components
 import WelcomeBanner from '../components/WelcomeBanner';
@@ -202,8 +203,8 @@ export default function Home() {
           justifyContent: 'space-between',
           padding: '0 20px'
         }}>
-          <Title level={4} style={{ margin: 0 }}>
-            CircleMatch - 台灣 {currentYear} 年度小學教師介聘配對系統
+          <Title level={5} style={{ margin: 0 }}>
+            {currentYear} 小學教師介聘配對系統
           </Title>
           <UserHeader 
             userInfo={userVM.userInfo}
@@ -323,8 +324,26 @@ export default function Home() {
           </Space>
         </Content>
         
-        <Footer style={{ textAlign: 'center' }}>
-          CircleMatch ©{new Date().getFullYear()} 台灣教師調動配對系統
+        <Footer style={{ 
+          textAlign: 'center', 
+          padding: '16px',
+          background: '#f9f9f9',
+          borderTop: '1px solid #e8e8e8'
+        }}>
+          <Typography.Text strong>CircleMatch</Typography.Text>
+          <Typography.Text type="secondary"> ©{new Date().getFullYear()}</Typography.Text>
+          
+          <div style={{ marginTop: '8px' }}>
+            <Space>
+              <Typography.Text type="secondary">Made with ♥  by </Typography.Text>
+              <a href="https://www.linkedin.com/in/iamyugachang/" target="_blank" rel="noopener noreferrer">
+                Yuga Chang
+              </a>
+              <a href="mailto:iamyugachang@gmail.com" title="Email">
+                <MailOutlined />
+              </a>
+            </Space>
+          </div>
         </Footer>
       </Layout>
     </ConfigProvider>

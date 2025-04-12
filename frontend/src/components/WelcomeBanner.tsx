@@ -18,7 +18,7 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({ onSuccess, onError }) => 
     <Card>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         <Title level={2}>
-          歡迎使用台灣 {currentYear} 年度小學教師介聘配對系統
+          {currentYear} 年度小學教師介聘配對系統
         </Title>
         
         <Paragraph>
@@ -39,39 +39,37 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({ onSuccess, onError }) => 
           items={[
             {
               title: '登入',
-              description: '使用 Google 帳號登入系統',
+              description: (
+                <div style={{ marginTop: '10px' }}>
+                  <GoogleLogin
+                    onSuccess={onSuccess}
+                    onError={onError}
+                  />
+                </div>
+              ),
               icon: <UserOutlined />,
+              status: "finish", // Add status finish to make it blue
             },
             {
               title: '填寫資料',
               description: '填寫您的現職學校及想調往的地區',
               icon: <FormOutlined />,
+              status: "finish", // Add status finish to make it blue
             },
             {
               title: '自動配對',
               description: '系統會自動尋找可能的配對組合',
               icon: <SearchOutlined />,
+              status: "finish", // Add status finish to make it blue
             },
             {
               title: '聯繫配對教師',
               description: '配對成功後，您可以查看對方的聯絡資訊',
               icon: <CheckOutlined />,
+              status: "finish", // Add status finish to make it blue
             },
           ]}
         />
-        
-        <Divider orientation="left">開始使用 {currentYear}年度介聘系統</Divider>
-        
-        <Paragraph>
-          請使用 Google 帳號登入，開始進行配對！
-        </Paragraph>
-        
-        <div style={{ textAlign: 'center', margin: '20px 0' }}>
-          <GoogleLogin
-            onSuccess={onSuccess}
-            onError={onError}
-          />
-        </div>
       </Space>
     </Card>
   );

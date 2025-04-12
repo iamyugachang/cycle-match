@@ -80,6 +80,11 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
             }
           });
           setTargetDistrictOptions(targetOptions);
+          
+          // Set current district options based on initial county
+          if (initialData.current_county && districtsMap[initialData.current_county]) {
+            setCurrentDistrictOptions(districtsMap[initialData.current_county]);
+          }
         } else if (defaultEmail) {
           form.setFieldsValue({ 
             email: defaultEmail,
@@ -112,7 +117,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
       setCurrentDistrictOptions([]);
     }
   };
-  
+
   const handleTargetCountyChange = (value: string, index: number) => {
     // Clear the district when county changes
     const targets = form.getFieldValue('targets');
@@ -142,14 +147,14 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
       target_counties: values.targets?.map((t: any) => t.county) || [],
       target_districts: values.targets?.map((t: any) => t.district) || [],
       google_id: initialData?.google_id,
-      year: currentYear
+      year: currentYear,
     };
     
     onSubmit(teacherData);
   };
 
   const counties = locations.map(county => county.name);
-
+    
   return (
     <Card title={
       <Title level={4}>
@@ -194,7 +199,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
             >
               <Select 
                 placeholder="請選擇區域" 
-                disabled={!form.getFieldValue('current_county') || currentDistrictOptions.length === 0}
+                disabled={!form.getFieldValue('current_county')}
                 showSearch
                 style={{ width: '100%' }}
               >
@@ -236,7 +241,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
         </Row>
         
         <Divider orientation="left">希望調往地區</Divider>
-        
         <Form.List name="targets">
           {(fields, { add, remove }) => (
             <>
@@ -300,7 +304,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
                   </Row>
                 </Card>
               ))}
-              
               <Form.Item>
                 <Button 
                   type="dashed" 
@@ -327,8 +330,9 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
         >
           <Input placeholder="例如：example@example.com" style={{ width: '100%' }} />
         </Form.Item>
+        
         <Text type="secondary" style={{ display: 'block', marginBottom: 24 }}>
-          僅供教師間聯絡，本站不會做任何用途
+          僅供教師間聯絡，本站不會做任何用途。為了安全考量，建議使用 Email 取代 Line 或即時通訊軟體。
         </Text>
         
         <Form.Item>
