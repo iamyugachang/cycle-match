@@ -4,12 +4,14 @@ import { UserInfo } from "../types";
 interface UserDropdownProps {
   userInfo: UserInfo;
   onShowResults: () => void;
+  onShowProfile: () => void; // New prop for showing profiles 
   onLogout: () => void;
 }
 
 const UserDropdown: React.FC<UserDropdownProps> = ({ 
   userInfo, 
   onShowResults, 
+  onShowProfile,
   onLogout 
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -79,6 +81,15 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
             <div className="user-info-name">{userInfo.name}</div>
             <div className="user-info-email">{userInfo.email}</div>
           </div>
+          <button
+            onClick={() => {
+              onShowProfile();
+              setShowDropdown(false);
+            }}
+            className="user-menu-item"
+          >
+            管理介聘資料
+          </button>
           <button
             onClick={() => {
               onShowResults();

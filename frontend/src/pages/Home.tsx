@@ -9,13 +9,14 @@ import TeacherFormContainer from "../components/TeacherFormContainer";
 import MatchList from "../components/MatchList";
 import TeacherInfoModal from "../components/TeacherInfoModal";
 import { DebugControls, TeacherSwitcher, PreviewSection } from "../components/ControlPanel";
+import TeacherProfilePage from "../components/TeacherProfilePage";
 import { Teacher } from "../types";
 
 export default function Home() {
   // UI state
   const [showResults, setShowResults] = useState(false);
   const [showForm, setShowForm] = useState(true);
-  const [showPreview, setShowPreview] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   // Initialize view models
   const userVM = useUserViewModel();
@@ -40,9 +41,47 @@ export default function Home() {
     }
   };
 
+  // Handle teacher update
+  const handleUpdateTeacher = async (updatedTeacher: Teacher) => {
+    try {
+      const result = await userVM.updateTeacher(updatedTeacher);
+      if (result) {
+        // Update successful, fetch matches
+        await matchVM.fetchMatches();
+        
+        // Show match results
+        setShowResults(true);
+        setShowProfile(false);
+      }
+    } catch (error) {
+      // Error is already handled in the view model
+    }
+  };
+
+  // Handle teacher deletion
+  const handleDeleteTeacher = async (teacherId: number) => {
+    try {
+      const success = await userVM.deleteTeacher(teacherId);
+      if (success) {
+        // If deletion successful, fetch matches
+        await matchVM.fetchMatches();
+        
+        // If we deleted all teachers, show form
+        if (userVM.allTeachers.length === 0) {
+          setShowForm(true);
+          setShowResults(false);
+          setShowProfile(false);
+        }
+      }
+    } catch (error) {
+      // Error is already handled in the view model
+    }
+  };
+
   // Handle back to form button
   const handleBackToForm = () => {
     setShowResults(false);
+    setShowProfile(false);
     setShowForm(true);
   };
 
@@ -52,6 +91,7 @@ export default function Home() {
     await matchVM.fetchMatches();
     setShowResults(true);
     setShowForm(false);
+    setShowProfile(false);
     
     // Create minimal debug session if user not logged in
     if (!userVM.userInfo) {
@@ -77,10 +117,12 @@ export default function Home() {
           matchVM.fetchMatches();
           setShowResults(true);
           setShowForm(false);
+          setShowProfile(false);
         } else {
           // No teacher data, show form
           setShowForm(true);
           setShowResults(false);
+          setShowProfile(false);
         }
       } catch (error) {
         // Error handled in view model
@@ -97,9 +139,11 @@ export default function Home() {
         await matchVM.fetchMatches();
         setShowResults(true);
         setShowForm(false);
+        setShowProfile(false);
       } else {
         setShowForm(true);
         setShowResults(false);
+        setShowProfile(false);
       }
     } catch (error) {
       // Error handled in view model
@@ -111,6 +155,14 @@ export default function Home() {
     matchVM.fetchMatches();
     setShowResults(true);
     setShowForm(false);
+    setShowProfile(false);
+  };
+
+  // Show profile from user dropdown
+  const handleShowProfile = () => {
+    setShowProfile(true);
+    setShowResults(false);
+    setShowForm(false);
   };
 
   // Switch between multiple teacher records
@@ -120,16 +172,23 @@ export default function Home() {
       matchVM.fetchMatches();
       setShowResults(true);
       setShowForm(false);
+      setShowProfile(false);
     }
   };
 
-  // Toggle preview visibility
-  const togglePreview = () => setShowPreview(!showPreview);
+  // Edit teacher profile
+  const handleEditTeacher = (teacherId: number) => {
+    userVM.startEditingTeacher(teacherId);
+    setShowProfile(true);
+    setShowResults(false);
+    setShowForm(false);
+  };
 
   return (
     <AppLayout 
       userInfo={userVM.userInfo}
       onShowResults={handleShowResults}
+      onShowProfile={handleShowProfile}
       onLogout={userVM.logout}
       onViewAllMatches={handleViewAllMatches}
       onDebugLogin={handleDebugLogin}
@@ -149,6 +208,22 @@ export default function Home() {
               defaultEmail={userVM.userInfo.email}
               loading={matchVM.loading || userVM.loading}
               error={matchVM.error || userVM.error}
+            />
+          )}
+
+          {/* Teacher Profile Page */}
+          {showProfile && (
+            <TeacherProfilePage
+              teachers={userVM.allTeachers}
+              currentTeacherId={userVM.currentTeacher?.id}
+              editingTeacher={userVM.editingTeacher}
+              loading={userVM.loading}
+              error={userVM.error}
+              onEditTeacher={handleEditTeacher}
+              onDeleteTeacher={handleDeleteTeacher}
+              onUpdateTeacher={handleUpdateTeacher}
+              onCancelEdit={userVM.cancelEditingTeacher}
+              onShowResults={handleShowResults}
             />
           )}
 
@@ -172,13 +247,6 @@ export default function Home() {
                   onSwitchTeacher={handleSwitchTeacher} 
                 />
               )}
-
-              {/* Preview Section - show current teacher data */}
-              <PreviewSection
-                showPreview={showPreview}
-                teacher={userVM.currentTeacher}
-                togglePreview={togglePreview}
-              />
 
               {/* Match results list */}
               <MatchList

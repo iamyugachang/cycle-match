@@ -7,6 +7,7 @@ interface AppLayoutProps {
   children: ReactNode;
   userInfo: UserInfo | null;
   onShowResults: () => void;
+  onShowProfile: () => void; // New prop for showing profiles
   onLogout: () => void;
   onViewAllMatches: () => void;
   onDebugLogin: () => void;
@@ -16,6 +17,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   children, 
   userInfo, 
   onShowResults, 
+  onShowProfile,
   onLogout,
   onViewAllMatches,
   onDebugLogin
@@ -35,8 +37,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       {userInfo && (
         <UserDropdown 
           userInfo={userInfo} 
-          onShowResults={onShowResults} 
-          onLogout={onLogout} 
+          onShowResults={onShowResults}
+          onShowProfile={onShowProfile}
+          onLogout={onLogout}
         />
       )}
 

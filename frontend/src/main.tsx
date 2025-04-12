@@ -14,6 +14,7 @@ import './styles/components/MatchList.css'
 import './styles/components/MatchCard.css'
 import './styles/components/Modal.css'
 import './styles/components/ControlPanel.css'
+import './styles/components/TeacherProfile.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
