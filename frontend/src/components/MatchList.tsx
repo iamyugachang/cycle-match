@@ -1,10 +1,10 @@
-import { Typography, Button, Table, Empty, Tabs, Card } from "antd";
-import { InfoCircleOutlined } from '@ant-design/icons';
+import React from 'react';
+import { Card, Typography, Button, Table, Empty, Tabs, Tag, Space } from 'antd';
+import { InfoCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { MatchResult, Teacher } from "../types";
 import { getMatchTypeName, isUserInvolved } from "../utils/matchUtils";
 
-const { Title, Text } = Typography;
-const { TabPane } = Tabs;
+const { Title } = Typography;
 
 interface MatchListProps {
   matches: MatchResult[];
@@ -33,8 +33,11 @@ const MatchList: React.FC<MatchListProps> = ({
       title: '教師',
       dataIndex: 'displayId',
       key: 'displayId',
-      render: (text: string, record: any) => (
-        <Text strong={record.isCurrentUser}>{text}</Text>
+      render: (_: string, record: any) => (
+        <Typography.Text strong={record.isCurrentUser}>
+          {record.displayId}
+          {record.isCurrentUser && <Tag color="blue" style={{ marginLeft: 8 }}>您</Tag>}
+        </Typography.Text>
       )
     },
     {
@@ -67,21 +70,6 @@ const MatchList: React.FC<MatchListProps> = ({
     },
   ];
 
-  // If no matches are found, show the "not found" message
-  if (userMatches.length === 0 && !isDebugMode) {
-    return (
-      <Card>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <Title level={2} style={{ margin: 0 }}>{title}</Title>
-          <Button onClick={onBackToForm}>返回表單</Button>
-        </div>
-        <Empty description={
-          <>尚未找到符合條件的配對結果。{currentTeacher ? "您的資料已登記，當有符合條件的教師登記時，系統將自動配對。" : ""}</>
-        } />
-      </Card>
-    );
-  }
-
   // Function to transform match data for table display
   const getMatchTableData = (match: MatchResult) => {
     return match.teachers.map((teacher, idx) => {
@@ -101,56 +89,93 @@ const MatchList: React.FC<MatchListProps> = ({
     });
   };
 
-  return (
-    <Card>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Title level={2} style={{ margin: 0 }}>{title}</Title>
-        <Button onClick={onBackToForm}>返回表單</Button>
-      </div>
+  // If no matches are found, show the "not found" message
+  if (userMatches.length === 0 && !isDebugMode) {
+    return (
+      <Card
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Title level={4} style={{ margin: 0 }}>{title}</Title>
+            <Button onClick={onBackToForm} icon={<ArrowLeftOutlined />}>返回表單</Button>
+          </div>
+        }
+      >
+        <Empty 
+          description={
+            <>尚未找到符合條件的配對結果。{currentTeacher ? "您的資料已登記，當有符合條件的教師登記時，系統將自動配對。" : ""}</>
+          } 
+        />
+      </Card>
+    );
+  }
 
-      <Tabs defaultActiveKey="userMatches">
-        {currentTeacher && userMatches.length > 0 && (
-          <TabPane tab="您的配對" key="userMatches">
-            {userMatches.map((match, index) => (
-              <Card 
-                title={getMatchTypeName(match)}
-                key={`user-${index}`}
-                style={{ marginBottom: 16, borderColor: '#3b82f6' }}
-                type="inner"
-              >
-                <Table 
-                  columns={columns} 
-                  dataSource={getMatchTableData(match)}
-                  pagination={false}
-                  size="small"
-                  rowClassName={(record) => record.isCurrentUser ? 'current-user-row' : ''}
-                />
-              </Card>
-            ))}
-          </TabPane>
-        )}
-        
-        {isDebugMode && (
-          <TabPane tab="所有可能的配對" key="allMatches">
-            {matches.map((match, index) => (
-              <Card 
-                title={getMatchTypeName(match)}
-                key={index}
-                style={{ marginBottom: 16 }}
-                type="inner"
-              >
-                <Table 
-                  columns={columns} 
-                  dataSource={getMatchTableData(match)}
-                  pagination={false}
-                  size="small"
-                  rowClassName={(record) => record.isCurrentUser ? 'current-user-row' : ''}
-                />
-              </Card>
-            ))}
-          </TabPane>
-        )}
-      </Tabs>
+  const items = [
+    {
+      key: 'userMatches',
+      label: '您的配對',
+      children: userMatches.length > 0 ? (
+        <Space direction="vertical" size="middle" style={{ display: 'flex', width: '100%' }}>
+          {userMatches.map((match, index) => (
+            <Card 
+              key={`user-${index}`}
+              title={getMatchTypeName(match)}
+              style={{ borderColor: '#1890ff' }}
+              size="small"
+            >
+              <Table 
+                columns={columns} 
+                dataSource={getMatchTableData(match)}
+                pagination={false}
+                rowClassName={(record: { isCurrentUser: boolean }) => record.isCurrentUser ? 'current-user-row' : ''}
+              />
+            </Card>
+          ))}
+        </Space>
+      ) : (
+        <Empty description="目前沒有您參與的配對" />
+      ),
+      disabled: userMatches.length === 0
+    }
+  ];
+
+  // Add debug tab if in debug mode
+  if (isDebugMode) {
+    items.push({
+      key: 'allMatches',
+      label: '所有可能的配對',
+      children: (
+        <Space direction="vertical" size="middle" style={{ display: 'flex', width: '100%' }}>
+          {matches.map((match, index) => (
+            <Card 
+              key={index}
+              title={getMatchTypeName(match)}
+              size="small"
+            >
+              <Table 
+                columns={columns} 
+                dataSource={getMatchTableData(match)}
+                pagination={false}
+                size="small"
+                rowClassName={(record: { isCurrentUser: boolean }) => record.isCurrentUser ? 'current-user-row' : ''}
+              />
+            </Card>
+          ))}
+        </Space>
+      ),
+      disabled: matches.length === 0
+    });
+  }
+
+  return (
+    <Card
+      title={
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Title level={4} style={{ margin: 0 }}>{title}</Title>
+          <Button onClick={onBackToForm} icon={<ArrowLeftOutlined />}>返回表單</Button>
+        </div>
+      }
+    >
+      <Tabs items={items} defaultActiveKey="userMatches" />
     </Card>
   );
 };

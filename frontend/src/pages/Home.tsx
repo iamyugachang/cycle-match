@@ -1,17 +1,21 @@
-import { useState } from "react";
-import { useUserViewModel } from "../viewmodels/UserViewModel";
-import { useMatchViewModel } from "../viewmodels/MatchViewModel";
+import React, { useState } from 'react';
+import { Layout, Typography, Space, ConfigProvider, theme } from 'antd';
+import { useUserViewModel } from '../viewmodels/UserViewModel';
+import { useMatchViewModel } from '../viewmodels/MatchViewModel';
 
 // Components
-import AppLayout from "../components/layout/AppLayout";
-import WelcomeBanner from "../components/WelcomeBanner";
-import TeacherFormContainer from "../components/TeacherFormContainer";
-import MatchList from "../components/MatchList";
-import TeacherInfoModal from "../components/TeacherInfoModal";
-import { DebugControls, TeacherSwitcher, PreviewSection } from "../components/ControlPanel";
-import TeacherProfilePage from "../components/TeacherProfilePage";
-import { Teacher } from "../types";
+import WelcomeBanner from '../components/WelcomeBanner';
+import TeacherFormContainer from '../components/TeacherFormContainer';
+import MatchList from '../components/MatchList';
+import TeacherInfoModal from '../components/TeacherInfoModal';
+import TeacherProfilePage from '../components/TeacherProfilePage';
+import { Teacher } from '../types';
 import AnnouncementBanner from '../components/AnnouncementBanner';
+import UserHeader from '../components/UserHeader';
+import DebugTools from '../components/DebugTools';
+
+const { Header, Content, Footer } = Layout;
+const { Title } = Typography;
 
 export default function Home() {
   // UI state
@@ -22,6 +26,9 @@ export default function Home() {
   // Initialize view models
   const userVM = useUserViewModel();
   const matchVM = useMatchViewModel(userVM.currentTeacher, userVM.allTeachers);
+  
+  // Current ROC year calculation
+  const currentYear = new Date().getFullYear() - 1911;
   
   // Handle teacher form submission
   const handleCreateTeacher = async (teacher: Teacher) => {
@@ -42,32 +49,25 @@ export default function Home() {
     }
   };
 
-  // Handle teacher update
+  // ...other handlers (condensed for brevity)
   const handleUpdateTeacher = async (updatedTeacher: Teacher) => {
     try {
       const result = await userVM.updateTeacher(updatedTeacher);
       if (result) {
-        // Update successful, fetch matches
         await matchVM.fetchMatches();
-        
-        // Show match results
         setShowResults(true);
         setShowProfile(false);
       }
     } catch (error) {
-      // Error is already handled in the view model
+      // Error handled in view model
     }
   };
 
-  // Handle teacher deletion
   const handleDeleteTeacher = async (teacherId: number) => {
     try {
       const success = await userVM.deleteTeacher(teacherId);
       if (success) {
-        // If deletion successful, fetch matches
         await matchVM.fetchMatches();
-        
-        // If we deleted all teachers, show form
         if (userVM.allTeachers.length === 0) {
           setShowForm(true);
           setShowResults(false);
@@ -75,15 +75,62 @@ export default function Home() {
         }
       }
     } catch (error) {
-      // Error is already handled in the view model
+      // Error handled in view model
     }
   };
 
-  // Handle back to form button
   const handleBackToForm = () => {
     setShowResults(false);
     setShowProfile(false);
     setShowForm(true);
+  };
+
+  const handleShowResults = () => {
+    matchVM.fetchMatches();
+    setShowResults(true);
+    setShowForm(false);
+    setShowProfile(false);
+  };
+
+  const handleShowProfile = () => {
+    setShowProfile(true);
+    setShowResults(false);
+    setShowForm(false);
+  };
+
+  const handleSwitchTeacher = (teacherId: number) => {
+    if (userVM.switchTeacher(teacherId)) {
+      matchVM.fetchMatches();
+      setShowResults(true);
+      setShowForm(false);
+      setShowProfile(false);
+    }
+  };
+
+  const handleEditTeacher = (teacherId: number) => {
+    userVM.startEditingTeacher(teacherId);
+    setShowProfile(true);
+    setShowResults(false);
+    setShowForm(false);
+  };
+
+  const handleLoginSuccess = async (credentialResponse: any) => {
+    try {
+      const result = await userVM.handleGoogleLoginSuccess(credentialResponse);
+      
+      if (result?.teachers?.length > 0) {
+        await matchVM.fetchMatches();
+        setShowResults(true);
+        setShowForm(false);
+        setShowProfile(false);
+      } else {
+        setShowForm(true);
+        setShowResults(false);
+        setShowProfile(false);
+      }
+    } catch (error) {
+      // Error handled in view model
+    }
   };
 
   // Debug: View all matches
@@ -131,156 +178,155 @@ export default function Home() {
     }
   };
 
-  // Handle Google login success
-  const handleLoginSuccess = async (credentialResponse: any) => {
-    try {
-      const result = await userVM.handleGoogleLoginSuccess(credentialResponse);
-      
-      if (result?.teachers?.length > 0) {
-        await matchVM.fetchMatches();
-        setShowResults(true);
-        setShowForm(false);
-        setShowProfile(false);
-      } else {
-        setShowForm(true);
-        setShowResults(false);
-        setShowProfile(false);
-      }
-    } catch (error) {
-      // Error handled in view model
-    }
-  };
-
-  // Show results from user dropdown
-  const handleShowResults = () => {
-    matchVM.fetchMatches();
-    setShowResults(true);
-    setShowForm(false);
-    setShowProfile(false);
-  };
-
-  // Show profile from user dropdown
-  const handleShowProfile = () => {
-    setShowProfile(true);
-    setShowResults(false);
-    setShowForm(false);
-  };
-
-  // Switch between multiple teacher records
-  const handleSwitchTeacher = (teacherId: number) => {
-    if (userVM.switchTeacher(teacherId)) {
-      // Refresh matches
-      matchVM.fetchMatches();
-      setShowResults(true);
-      setShowForm(false);
-      setShowProfile(false);
-    }
-  };
-
-  // Edit teacher profile
-  const handleEditTeacher = (teacherId: number) => {
-    userVM.startEditingTeacher(teacherId);
-    setShowProfile(true);
-    setShowResults(false);
-    setShowForm(false);
-  };
-
   return (
-    <AppLayout 
-      userInfo={userVM.userInfo}
-      onShowResults={handleShowResults}
-      onShowProfile={handleShowProfile}
-      onLogout={userVM.logout}
-      onViewAllMatches={handleViewAllMatches}
-      onDebugLogin={handleDebugLogin}
+    <ConfigProvider
+      theme={{
+        algorithm: theme.defaultAlgorithm,
+        components: {
+          Layout: {
+            bodyBg: '#f5f5f5',
+          },
+        },
+      }}
     >
-      {/* Landing page for unauthenticated users */}
-      {!userVM.userInfo ? (
-        <WelcomeBanner 
-          onSuccess={handleLoginSuccess}
-          onError={userVM.handleGoogleLoginFailure}
-        />
-      ) : (
-        <>
-          {/* Teacher registration form */}
-          {showForm && (
-            <>
-              <AnnouncementBanner />
-              <TeacherFormContainer
-                onSubmit={handleCreateTeacher}
-                defaultEmail={userVM.userInfo.email}
-                loading={matchVM.loading || userVM.loading}
-                error={matchVM.error || userVM.error}
-              />
-            </>
-          )}
-
-          {/* Teacher Profile Page */}
-          {showProfile && (
-            <>
-              <AnnouncementBanner />
-              <TeacherProfilePage
-                teachers={userVM.allTeachers}
-                currentTeacherId={userVM.currentTeacher?.id}
-                editingTeacher={userVM.editingTeacher}
-                loading={userVM.loading}
-                error={userVM.error}
-                onEditTeacher={handleEditTeacher}
-                onDeleteTeacher={handleDeleteTeacher}
-                onUpdateTeacher={handleUpdateTeacher}
-                onCancelEdit={userVM.cancelEditingTeacher}
-                onShowResults={handleShowResults}
-                onBackToForm={handleBackToForm}
-              />
-            </>  
-          )}
-
-          {/* Match results display */}
-          {showResults && (
-            <>
-              <AnnouncementBanner />
-              {/* Debug mode controls */}
-              <DebugControls 
-                isDebugMode={matchVM.isDebugMode}
-                userView={matchVM.userView}
-                toggleUserView={matchVM.toggleUserView}
-                onViewAllMatches={handleViewAllMatches}
-                onDebugLogin={handleDebugLogin}
-              />
-
-              {/* Teacher switcher - only visible with multiple teacher records */}
-              {userVM.allTeachers.length > 1 && (
-                <TeacherSwitcher 
-                  teachers={userVM.allTeachers} 
-                  currentTeacherId={userVM.currentTeacher?.id} 
-                  onSwitchTeacher={handleSwitchTeacher} 
+      <Layout style={{ minHeight: '100vh' }}>
+        <Header style={{ 
+          background: '#fff', 
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1,
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 20px'
+        }}>
+          <Title level={4} style={{ margin: 0 }}>
+            CircleMatch - 台灣 {currentYear} 年度小學教師介聘配對系統
+          </Title>
+          <UserHeader 
+            userInfo={userVM.userInfo}
+            onShowResults={handleShowResults}
+            onShowProfile={handleShowProfile}
+            onLogout={userVM.logout}
+          />
+        </Header>
+        
+        <Content style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            {/* Announcement banner shown when logged in */}
+            {userVM.userInfo && (
+              <>
+                {/* Debug Tools - for development only */}
+                <DebugTools
+                  isDebugMode={matchVM.isDebugMode}
+                  userView={matchVM.userView}
+                  toggleUserView={matchVM.toggleUserView}
+                  onViewAllMatches={handleViewAllMatches}
+                  onDebugLogin={handleDebugLogin}
                 />
-              )}
 
-              {/* Match results list */}
-              <MatchList
-                matches={matchVM.getFilteredMatches()}
-                currentTeacher={userVM.currentTeacher}
-                onShowTeacherInfo={matchVM.showTeacherInfo}
-                onBackToForm={handleBackToForm}
-                title={matchVM.getViewModeTitle()}
-                isDebugMode={matchVM.isDebugMode && !matchVM.userView}
+                <AnnouncementBanner />
+              </>
+            )}
+            
+            {/* Main content area */}
+            {!userVM.userInfo ? (
+              <WelcomeBanner 
+                onSuccess={handleLoginSuccess}
+                onError={userVM.handleGoogleLoginFailure}
               />
-            </>
-          )}
+            ) : (
+              <>
+                {/* Teacher registration form */}
+                {showForm && (
+                  <TeacherFormContainer
+                    onSubmit={handleCreateTeacher}
+                    defaultEmail={userVM.userInfo.email}
+                    loading={matchVM.loading || userVM.loading}
+                    error={matchVM.error || userVM.error}
+                  />
+                )}
 
-          {/* Teacher info modal */}
-          {matchVM.teacherInfo && (
-            <TeacherInfoModal
-              id={matchVM.teacherInfo.id}
-              email={matchVM.teacherInfo.email}
-              matches={matchVM.matches}
-              onClose={matchVM.closeTeacherInfo}
-              isOpen={matchVM.teacherInfo.isOpen || false}
-            />
-          )}
-        </>
-      )}
-    </AppLayout>
+                {/* Teacher Profile Page */}
+                {showProfile && (
+                  <TeacherProfilePage
+                    teachers={userVM.allTeachers}
+                    currentTeacherId={userVM.currentTeacher?.id}
+                    editingTeacher={userVM.editingTeacher}
+                    loading={userVM.loading}
+                    error={userVM.error}
+                    onEditTeacher={handleEditTeacher}
+                    onDeleteTeacher={handleDeleteTeacher}
+                    onUpdateTeacher={handleUpdateTeacher}
+                    onCancelEdit={userVM.cancelEditingTeacher}
+                    onShowResults={handleShowResults}
+                    onBackToForm={handleBackToForm}
+                  />
+                )}
+
+                {/* Match results display */}
+                {showResults && (
+                  <>
+                    {/* Teacher switcher - only visible with multiple teacher records */}
+                    {userVM.allTeachers.length > 1 && (
+                      <div style={{ marginBottom: '16px' }}>
+                        <Space direction="vertical" style={{ width: '100%' }}>
+                          <Typography.Text strong>您有多個學校資料，請選擇要查看的學校：</Typography.Text>
+                          <Space wrap>
+                            {userVM.allTeachers.map(teacher => (
+                              <a 
+                                key={teacher.id}
+                                onClick={() => teacher.id && handleSwitchTeacher(teacher.id)}
+                                style={{ 
+                                  padding: '8px 12px',
+                                  border: '1px solid #d9d9d9',
+                                  borderRadius: '4px',
+                                  background: teacher.id === userVM.currentTeacher?.id ? '#e6f7ff' : 'white',
+                                  cursor: 'pointer',
+                                  display: 'inline-block'
+                                }}
+                              >
+                                {teacher.current_county} • {teacher.current_district} • {teacher.current_school} • {teacher.subject || '未指定科目'}
+                              </a>
+                            ))}
+                          </Space>
+                        </Space>
+                      </div>
+                    )}
+
+                    {/* Match results list */}
+                    <MatchList
+                      matches={matchVM.getFilteredMatches()}
+                      currentTeacher={userVM.currentTeacher}
+                      onShowTeacherInfo={matchVM.showTeacherInfo}
+                      onBackToForm={handleBackToForm}
+                      title={`${currentYear}年度配對結果`}
+                      isDebugMode={matchVM.isDebugMode}
+                    />
+                  </>
+                )}
+
+                {/* Teacher info modal */}
+                {matchVM.teacherInfo && (
+                  <TeacherInfoModal
+                    id={matchVM.teacherInfo.id}
+                    email={matchVM.teacherInfo.email}
+                    matches={matchVM.matches}
+                    onClose={matchVM.closeTeacherInfo}
+                    isOpen={matchVM.teacherInfo.isOpen || false}
+                  />
+                )}
+              </>
+            )}
+          </Space>
+        </Content>
+        
+        <Footer style={{ textAlign: 'center' }}>
+          CircleMatch ©{new Date().getFullYear()} 台灣教師調動配對系統
+        </Footer>
+      </Layout>
+    </ConfigProvider>
   );
 }

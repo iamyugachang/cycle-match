@@ -1,21 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { ConfigProvider } from 'antd';
-import zhTW from 'antd/locale/zh_TW';
-import './styles/antd-custom.css'; // Import our custom styles
-
-import 'antd/dist/reset.css';
-import './styles/index.css';
-import './styles/components/Layout.css';
-import './styles/components/TeacherForm.css';
-import './styles/components/LocationSelector.css';
-import './styles/components/ControlPanel.css';
+import 'antd/dist/reset.css'; // Ant Design styles
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ConfigProvider locale={zhTW}>
-      <App />
-    </ConfigProvider>
+    <App />
   </React.StrictMode>
 );

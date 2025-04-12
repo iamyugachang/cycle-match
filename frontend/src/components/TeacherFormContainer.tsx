@@ -1,5 +1,7 @@
-import TeacherForm from "./TeacherForm";
-import { Teacher } from "../types";
+import React from 'react';
+import { Alert, Spin } from 'antd';
+import TeacherForm from './TeacherForm';
+import { Teacher } from '../types';
 
 interface TeacherFormContainerProps {
   onSubmit: (teacher: Teacher) => void;
@@ -14,20 +16,14 @@ const TeacherFormContainer: React.FC<TeacherFormContainerProps> = ({
   loading,
   error
 }) => {
-  // 取得當前民國年度
-  const currentYear = new Date().getFullYear() - 1911;
-  
   return (
-    <div className="teacher-form-container">
-      <div className="teacher-form-header">
-        <h2 className="teacher-form-title">登記 {currentYear} 年度介聘資料</h2>
-      </div>
+    <>
+      {error && <Alert message={error} type="error" style={{ marginBottom: 16 }} />}
       
-      <TeacherForm onSubmit={onSubmit} defaultEmail={defaultEmail} />
-      
-      {loading && <p className="loading-indicator">處理中...</p>}
-      {error && <p className="error-message">{error}</p>}
-    </div>
+      <Spin spinning={loading} tip="處理中...">
+        <TeacherForm onSubmit={onSubmit} defaultEmail={defaultEmail} />
+      </Spin>
+    </>
   );
 };
 

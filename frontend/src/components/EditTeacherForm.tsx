@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Card, Button, Typography, Space, Alert, Spin } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import TeacherForm from './TeacherForm';
 import { Teacher } from '../types';
+
+const { Title } = Typography;
 
 interface EditTeacherFormProps {
   teacher: Teacher;
@@ -17,32 +21,37 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
   loading,
   error
 }) => {
-  // Modify the current teacher year to display correctly
+  // Get current ROC year
   const currentYear = new Date().getFullYear() - 1911;
   
   return (
-    <div className="edit-teacher-form-container">
-      <div className="edit-teacher-form-header">
-        <h2 className="edit-teacher-form-title">編輯 {currentYear} 年度介聘資料</h2>
-        <button 
-          onClick={onCancel}
-          className="cancel-edit-button"
-          disabled={loading}
-        >
-          取消編輯
-        </button>
-      </div>
-      
-      <TeacherForm 
-        onSubmit={onSubmit} 
-        defaultEmail={teacher.email}
-        initialData={teacher}
-        isEditing={true}
-      />
-      
-      {loading && <p className="loading-indicator">處理中...</p>}
-      {error && <p className="error-message">{error}</p>}
-    </div>
+    <Card
+      title={
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Title level={4}>編輯 {currentYear} 年度介聘資料</Title>
+          <Button 
+            onClick={onCancel} 
+            icon={<ArrowLeftOutlined />}
+            disabled={loading}
+          >
+            取消編輯
+          </Button>
+        </div>
+      }
+    >
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        {error && <Alert message={error} type="error" showIcon />}
+        
+        <Spin spinning={loading} tip="處理中...">
+          <TeacherForm 
+            onSubmit={onSubmit} 
+            defaultEmail={teacher.email}
+            initialData={teacher}
+            isEditing={true}
+          />
+        </Spin>
+      </Space>
+    </Card>
   );
 };
 
