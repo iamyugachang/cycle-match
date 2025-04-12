@@ -86,6 +86,44 @@ export class ApiService {
     }
   }
 
+  // New method to update a teacher record
+  static async updateTeacher(teacherId: number, teacher: Teacher): Promise<Teacher> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/teachers/${teacherId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(teacher),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`後端錯誤: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(handleApiError(error, '更新教師資料失敗，請稍後再試'));
+    }
+  }
+
+  // New method to delete a teacher record
+  static async deleteTeacher(teacherId: number): Promise<void> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/teachers/${teacherId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`後端錯誤: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+    } catch (error) {
+      throw new Error(handleApiError(error, '刪除教師資料失敗，請稍後再試'));
+    }
+  }
+
   // Match-related endpoints
   static async getMatches(): Promise<MatchResult[]> {
     try {
@@ -129,7 +167,7 @@ export class ApiService {
     } catch (error) {
       console.error('Error fetching subjects:', error);
       // Return default subjects if API fails
-      return ['一般', '英文', '體育', '音樂', '美術', '資訊', '特教', '行政'];
+      return ["一般", "英文", "體育", "音樂", "美術", "資訊", "特教", "行政"];
     }
   }
 }

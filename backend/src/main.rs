@@ -3,10 +3,11 @@ mod db;
 mod matcher;
 
 use axum::{
-    routing::{get, post},
+    routing::{get, post, put, delete},
     Router, extract::State,
     http::Method, extract::Json,
     response::IntoResponse,
+    extract::Path,
 };
 use serde::Serialize;
 use serde::Deserialize;
@@ -37,7 +38,7 @@ async fn main() {
 
     let cors = CorsLayer::new()
         .allow_origin(Any)
-        .allow_methods([Method::GET, Method::POST])
+        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
         .allow_headers(Any);
 
     let app = Router::new()
@@ -48,7 +49,9 @@ async fn main() {
         .route("/api/matches", get(find_matches))
         .route("/api/google-login", post(google_login))
         .route("/api/districts", get(get_districts))
-        .route("/api/subjects", get(get_subjects)) // Add this new route
+        .route("/api/subjects", get(get_subjects))
+        .route("/api/teachers/:id", put(update_teacher_handler))
+        .route("/api/teachers/:id", delete(delete_teacher_handler))
         .with_state(pool)
         .layer(cors);
 
@@ -266,4 +269,77 @@ struct GoogleTokenInfo {
 async fn get_subjects() -> impl IntoResponse {
     let subjects = db::get_elementary_subjects();
     Json(subjects)
+}
+
+async fn update_teacher_handler(
+    State(pool): State<Pool<Postgres>>,
+    Path(teacher_id): Path<i32>,
+    Json(teacher): Json<Teacher>,
+) -> Result<Json<Teacher>, (axum::http::StatusCode, String)> {
+    tracing::info!("接收到的教師更新數據: {:?}", teacher);
+    
+    // 檢查必填欄位
+    if teacher.current_county.trim().is_empty() {
+        return Err((
+            axum::http::StatusCode::BAD_REQUEST,
+            "縣市不能為空".to_string(),
+        ));
+    }
+    
+    if teacher.current_district.trim().is_empty() {
+        return Err((
+            axum::http::StatusCode::BAD_REQUEST,
+            "區域不能為空".to_string(),
+        ));
+    }
+    
+    // 更新教師數據
+    match db::update_teacher(&pool, teacher_id, teacher).await {
+        Ok(updated) => {
+            tracing::info!("成功更新教師: {:?}", updated);
+            Ok(Json(updated))
+        },
+        Err(e) => {
+            let error_msg = format!("更新教師失敗: {}", e);
+            tracing::error!("{}", error_msg);
+            
+            // 區分不同類型的錯誤
+            match e {
+                sqlx::Error::RowNotFound => {
+                    Err((axum::http::StatusCode::NOT_FOUND, "找不到該教師資料".to_string()))
+                },
+                _ => {
+                    Err((axum::http::StatusCode::INTERNAL_SERVER_ERROR, error_msg))
+                }
+            }
+        }
+    }
+}
+
+async fn delete_teacher_handler(
+    State(pool): State<Pool<Postgres>>,
+    Path(teacher_id): Path<i32>,
+) -> Result<impl IntoResponse, (axum::http::StatusCode, String)> {
+    tracing::info!("請求刪除教師 ID: {}", teacher_id);
+    
+    match db::delete_teacher(&pool, teacher_id).await {
+        Ok(_) => {
+            tracing::info!("成功刪除教師 ID: {}", teacher_id);
+            Ok(axum::http::StatusCode::NO_CONTENT)
+        },
+        Err(e) => {
+            let error_msg = format!("刪除教師失敗: {}", e);
+            tracing::error!("{}", error_msg);
+            
+            // 區分不同類型的錯誤
+            match e {
+                sqlx::Error::RowNotFound => {
+                    Err((axum::http::StatusCode::NOT_FOUND, "找不到該教師資料".to_string()))
+                },
+                _ => {
+                    Err((axum::http::StatusCode::INTERNAL_SERVER_ERROR, error_msg))
+                }
+            }
+        }
+    }
 }

@@ -6,6 +6,7 @@ export const useUserViewModel = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [currentTeacher, setCurrentTeacher] = useState<Teacher | null>(null);
   const [allTeachers, setAllTeachers] = useState<Teacher[]>([]); // All teachers associated with current user
+  const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null); // Track which teacher is being edited
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   
@@ -64,6 +65,85 @@ export const useUserViewModel = () => {
     return false;
   };
 
+  // Start editing a teacher
+  const startEditingTeacher = (teacherId: number) => {
+    const teacher = allTeachers.find(t => t.id === teacherId);
+    if (teacher) {
+      setEditingTeacher(teacher);
+      return true;
+    }
+    return false;
+  };
+
+  // Cancel editing a teacher
+  const cancelEditingTeacher = () => {
+    setEditingTeacher(null);
+  };
+
+  // Update a teacher record
+  const updateTeacher = async (updatedTeacher: Teacher) => {
+    if (!updatedTeacher.id) {
+      setError("找不到要更新的教師ID");
+      return null;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const updated = await ApiService.updateTeacher(updatedTeacher.id, updatedTeacher);
+      
+      // Update all teachers list
+      const updatedTeachers = allTeachers.map(t => 
+        t.id === updated.id ? updated : t
+      );
+      setAllTeachers(updatedTeachers);
+      
+      // Update current teacher if needed
+      if (currentTeacher?.id === updated.id) {
+        setCurrentTeacher(updated);
+      }
+      
+      // Clear editing state
+      setEditingTeacher(null);
+      
+      return updated;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "更新教師資料失敗，請稍後再試";
+      setError(errorMessage);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete a teacher record
+  const deleteTeacher = async (teacherId: number) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      await ApiService.deleteTeacher(teacherId);
+      
+      // Remove from all teachers
+      const remainingTeachers = allTeachers.filter(t => t.id !== teacherId);
+      setAllTeachers(remainingTeachers);
+      
+      // Update current teacher if needed
+      if (currentTeacher?.id === teacherId) {
+        setCurrentTeacher(remainingTeachers.length > 0 ? remainingTeachers[0] : null);
+      }
+      
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "刪除教師資料失敗，請稍後再試";
+      setError(errorMessage);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Debug login (for development/testing)
   const debugLogin = async (googleId: string) => {
     if (!googleId) return null;
@@ -119,6 +199,7 @@ export const useUserViewModel = () => {
     userInfo,
     currentTeacher,
     allTeachers,
+    editingTeacher,
     loading,
     error,
     setUserInfo,
@@ -127,6 +208,10 @@ export const useUserViewModel = () => {
     handleGoogleLoginSuccess,
     handleGoogleLoginFailure,
     switchTeacher,
+    startEditingTeacher,
+    cancelEditingTeacher,
+    updateTeacher,
+    deleteTeacher,
     logout,
     debugLogin
   };

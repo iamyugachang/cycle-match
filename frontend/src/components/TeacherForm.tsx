@@ -6,13 +6,21 @@ import { fetchSubjects } from "../utils/subjectUtils";
 interface TeacherFormProps {
   onSubmit: (teacher: Teacher) => void;
   defaultEmail?: string;
+  initialData?: Teacher; // For edit mode
+  isEditing?: boolean;
 }
 
-const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }) => {
+const TeacherForm: React.FC<TeacherFormProps> = ({ 
+  onSubmit, 
+  defaultEmail = "", 
+  initialData, 
+  isEditing = false 
+}) => {
   // 自動計算當前民國年份
   const currentYear = new Date().getFullYear() - 1911;
   
-  const [formData, setFormData] = useState<Teacher>({
+  // Initialize form with default data or provided initialData
+  const [formData, setFormData] = useState<Teacher>(initialData || {
     id: undefined,
     email: defaultEmail,
     current_county: "",
@@ -22,9 +30,18 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
     target_districts: [""],
     subject: "",
     display_id: "",
-    google_id: undefined,
+    google_id: initialData?.google_id,
     year: currentYear // 預設為當前民國年
   });
+
+  // Update form when initialData or defaultEmail changes
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    } else if (defaultEmail && !formData.email) {
+      setFormData(prev => ({...prev, email: defaultEmail}));
+    }
+  }, [initialData, defaultEmail]);
 
   // Change this to only show validation errors after submission attempt
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
@@ -253,7 +270,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
       fontSize: isMobile ? "14px" : "12px" // Larger for touch targets
     },
     submitButton: {
-      backgroundColor: "#007bff",
+      backgroundColor: isEditing ? "#28a745" : "#007bff", // Green for update, blue for create
       color: "white",
       padding: isMobile ? "15px 16px" : "10px 16px", // Taller button on mobile
       width: "100%",
@@ -453,7 +470,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ onSubmit, defaultEmail = "" }
         type="submit"
         style={{...formStyles.button, ...formStyles.submitButton}}
       >
-        送出介聘資料
+        {isEditing ? "更新介聘資料" : "送出介聘資料"}
       </button>
     </form>
   );

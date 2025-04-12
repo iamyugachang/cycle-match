@@ -1,0 +1,246 @@
+/* Teacher Profile Card Styles */
+.teacher-profile-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .teacher-profile-card.current {
+    border-left: 4px solid #007bff;
+  }
+  
+  .teacher-profile-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .teacher-profile-header {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    background-color: #f8f9fa;
+  }
+  
+  .teacher-profile-title {
+    flex: 1;
+  }
+  
+  .teacher-profile-title h3 {
+    margin: 0 0 5px 0;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .teacher-id {
+    font-size: 12px;
+    color: #6c757d;
+    display: block;
+  }
+  
+  .teacher-profile-body {
+    padding: 16px;
+  }
+  
+  .teacher-profile-row {
+    margin-bottom: 12px;
+  }
+  
+  .teacher-profile-label {
+    font-weight: 600;
+    color: #495057;
+    margin-right: 8px;
+  }
+  
+  .teacher-profile-value {
+    color: #212529;
+  }
+  
+  .teacher-profile-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+  }
+  
+  .teacher-profile-target {
+    padding: 6px 10px;
+    background-color: #f1f3f5;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+  
+  /* Teacher Actions Styles */
+  .teacher-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .edit-button, .delete-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .edit-button {
+    background-color: #17a2b8;
+    color: white;
+  }
+  
+  .edit-button:hover {
+    background-color: #138496;
+  }
+  
+  .delete-button {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .delete-button:hover {
+    background-color: #c82333;
+  }
+  
+  /* Teacher Profile Page Styles */
+  .teacher-profile-page {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+  
+  .teacher-profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .teacher-profile-header h2 {
+    margin: 0;
+  }
+  
+  .view-matches-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .view-matches-button:hover {
+    background-color: #218838;
+  }
+  
+  .teacher-profile-empty {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 30px;
+  }
+  
+  .teacher-profile-empty h2 {
+    margin-top: 0;
+    color: #6c757d;
+  }
+  
+  /* Edit Form Styles */
+  .edit-teacher-form-container {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+  }
+  
+  .edit-teacher-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .edit-teacher-form-title {
+    margin: 0;
+    color: #28a745;
+  }
+  
+  .cancel-edit-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .cancel-edit-button:hover {
+    background-color: #5a6268;
+  }
+  
+  .cancel-edit-button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  
+  .loading-indicator {
+    text-align: center;
+    color: #6c757d;
+    margin-top: 15px;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    background-color: #f8d7da;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin: 15px 0;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .teacher-profile-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .view-matches-button {
+      width: 100%;
+    }
+    
+    .teacher-actions {
+      margin-top: 10px;
+      justify-content: flex-end;
+      width: 100%;
+    }
+    
+    .edit-button, .delete-button {
+      padding: 10px 15px;
+      font-size: 15px;
+    }
+    
+    .edit-teacher-form-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .cancel-edit-button {
+      width: 100%;
+      padding: 10px 15px;
+    }
+  }

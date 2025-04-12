@@ -1,0 +1,52 @@
+/* Announcement Banner Styles */
+.announcement-banner {
+    background-color: #fef8e0;
+    border: 1px solid #f8d7a0;
+    color: #856404;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .announcement-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .announcement-icon {
+    flex-shrink: 0;
+    color: #856404;
+  }
+  
+  .announcement-text {
+    flex: 1;
+  }
+  
+  .announcement-close {
+    background: none;
+    border: none;
+    color: #856404;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    margin-left: 15px;
+  }
+  
+  .announcement-close:hover {
+    color: #66500a;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .announcement-banner {
+      padding: 12px;
+      font-size: 13px;
+    }
+  }

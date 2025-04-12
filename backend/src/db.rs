@@ -595,3 +595,119 @@ async fn add_test_data(pool: &Pool<Postgres>) -> Result<(), sqlx::Error> {
 
     Ok(())
 }
+
+pub async fn update_teacher(
+    pool: &Pool<Postgres>,
+    teacher_id: i32,
+    teacher: Teacher,
+) -> Result<Teacher, sqlx::Error> {
+    // Ensure the teacher ID matches
+    if teacher.id.is_some() && teacher.id.unwrap() != teacher_id {
+        return Err(sqlx::Error::RowNotFound);
+    }
+
+    // Using transaction to ensure atomicity
+    let mut tx = pool.begin().await?;
+
+    // Check if teacher exists first
+    let existing = sqlx::query("SELECT id FROM teachers WHERE id = $1")
+        .bind(teacher_id)
+        .fetch_optional(&mut *tx)
+        .await?;
+
+    if existing.is_none() {
+        return Err(sqlx::Error::RowNotFound);
+    }
+
+    // Update teacher data
+    let row = sqlx::query(
+        r#"
+        UPDATE teachers 
+        SET 
+            name = $1,
+            email = $2,
+            year = $3,
+            subject = $4,
+            current_county = $5, 
+            current_district = $6, 
+            current_school = $7, 
+            target_counties = $8,
+            target_districts = $9
+        WHERE id = $10
+        RETURNING 
+            id, 
+            name,
+            display_id,
+            email,
+            google_id,
+            year,
+            subject,
+            current_county, 
+            current_district, 
+            current_school, 
+            target_counties,
+            target_districts,
+            created_at
+        "#
+    )
+    .bind(&teacher.name.unwrap_or_else(|| format!("User-{}", Uuid::new_v4())))
+    .bind(&teacher.email)
+    .bind(&teacher.year)
+    .bind(&teacher.subject)
+    .bind(&teacher.current_county)
+    .bind(&teacher.current_district)
+    .bind(&teacher.current_school)
+    .bind(&teacher.target_counties)
+    .bind(&teacher.target_districts)
+    .bind(teacher_id)
+    .fetch_one(&mut *tx)
+    .await?;
+
+    // Commit the transaction
+    tx.commit().await?;
+
+    Ok(Teacher {
+        id: row.get("id"),
+        name: Some(row.get("name")),
+        display_id: Some(row.get("display_id")),
+        email: row.get("email"),
+        google_id: row.get("google_id"),
+        year: row.get("year"),
+        subject: row.get("subject"),
+        current_county: row.get("current_county"),
+        current_district: row.get("current_district"),
+        current_school: row.get("current_school"),
+        target_counties: row.get("target_counties"),
+        target_districts: row.get("target_districts"),
+        created_at: row.get("created_at"),
+    })
+}
+
+pub async fn delete_teacher(
+    pool: &Pool<Postgres>, 
+    teacher_id: i32
+) -> Result<(), sqlx::Error> {
+    // Using transaction to ensure atomicity
+    let mut tx = pool.begin().await?;
+
+    // Check if teacher exists first
+    let existing = sqlx::query("SELECT id FROM teachers WHERE id = $1")
+        .bind(teacher_id)
+        .fetch_optional(&mut *tx)
+        .await?;
+
+    if existing.is_none() {
+        return Err(sqlx::Error::RowNotFound);
+    }
+
+    // Delete the teacher
+    sqlx::query("DELETE FROM teachers WHERE id = $1")
+        .bind(teacher_id)
+        .execute(&mut *tx)
+        .await?;
+
+    // Commit the transaction
+    tx.commit().await?;
+
+    Ok(())
+}
