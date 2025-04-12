@@ -35,6 +35,27 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
     year: currentYear // 預設為當前民國年
   });
 
+  // Add state for subjects
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
+
+  // Fetch subjects when component mounts
+  useEffect(() => {
+    const getSubjects = async () => {
+      try {
+        setLoadingSubjects(true);
+        const subjectList = await fetchSubjects();
+        setSubjects(subjectList);
+      } catch (error) {
+        console.error("Failed to fetch subjects:", error);
+      } finally {
+        setLoadingSubjects(false);
+      }
+    };
+
+    getSubjects();
+  }, []);
+
   // Update form when initialData or defaultEmail changes
   useEffect(() => {
     if (initialData) {
