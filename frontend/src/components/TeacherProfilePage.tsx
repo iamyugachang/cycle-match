@@ -15,7 +15,7 @@ interface TeacherProfilePageProps {
   onUpdateTeacher: (teacher: Teacher) => void;
   onCancelEdit: () => void;
   onShowResults: () => void;
-  onBackToForm: () => void;
+  onBackToForm?: () => void;
 }
 
 const TeacherProfilePage: React.FC<TeacherProfilePageProps> = ({
@@ -37,8 +37,9 @@ const TeacherProfilePage: React.FC<TeacherProfilePageProps> = ({
       <div className="teacher-profile-empty">
         <h2>您尚未登記任何介聘資料</h2>
         <button 
-          className="back-button"
+          className="back-button primary-button"
           onClick={onBackToForm}
+          style={{ padding: '10px 20px', fontSize: '1rem' }}
         >
           返回首頁填寫介聘資料
         </button>
