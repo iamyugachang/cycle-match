@@ -15,7 +15,7 @@ interface TeacherProfilePageProps {
   onUpdateTeacher: (teacher: Teacher) => void;
   onCancelEdit: () => void;
   onShowResults: () => void;
-  onBackToForm: () => void; // New prop for navigating to form
+  onBackToForm: () => void;
 }
 
 const TeacherProfilePage: React.FC<TeacherProfilePageProps> = ({
@@ -31,6 +31,21 @@ const TeacherProfilePage: React.FC<TeacherProfilePageProps> = ({
   onShowResults,
   onBackToForm
 }) => {
+  // If no teachers, show empty state
+  if (teachers.length === 0) {
+    return (
+      <div className="teacher-profile-empty">
+        <h2>您尚未登記任何介聘資料</h2>
+        <button 
+          className="back-button"
+          onClick={onBackToForm}
+        >
+          返回首頁填寫介聘資料
+        </button>
+      </div>
+    );
+  }
+
   // If in edit mode, show the edit form
   if (editingTeacher) {
     return (
