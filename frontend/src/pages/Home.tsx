@@ -230,6 +230,7 @@ export default function Home() {
                 onUpdateTeacher={handleUpdateTeacher}
                 onCancelEdit={userVM.cancelEditingTeacher}
                 onShowResults={handleShowResults}
+                onBackToForm={handleBackToForm}
               />
             </>  
           )}

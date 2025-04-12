@@ -147,8 +147,6 @@ export const useUserViewModel = () => {
   // Debug login (for development/testing)
   const debugLogin = async (googleId: string) => {
     if (!googleId) return null;
-
-    console.log("Debug mode: 模擬 Google 登入, ID:", googleId);
     
     const mockUserInfo = {
       name: "Debug User",

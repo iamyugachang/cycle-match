@@ -50,7 +50,6 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         
         // If we have a default county, load its districts
         if (defaultCounty && allCounties.includes(defaultCounty)) {
-          console.log("LocationSelector: Setting initial county from props:", defaultCounty);
           setSelectedCounty(defaultCounty);
           
           const countyDistricts = getDistrictsByCounty(data, defaultCounty);
@@ -81,7 +80,6 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     }
     
     if (defaultCounty && defaultCounty !== selectedCounty) {
-      console.log("LocationSelector: Updating county from props change:", defaultCounty);
       setSelectedCounty(defaultCounty);
       
       if (locations.length > 0) {
@@ -100,7 +98,6 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   
   const handleCountyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const county = e.target.value;
-    console.log("LocationSelector: county selected:", county);
     
     // Update local state first
     setSelectedCounty(county);
@@ -145,6 +142,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         }}>
           <label htmlFor="county" style={{ display: "block", marginBottom: "5px" }}>
             {label.county}
+            {required && <span className="required-mark">*</span>}
           </label>
           <select
             id="county"
@@ -181,6 +179,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         }}>
           <label htmlFor="district" style={{ display: "block", marginBottom: "5px" }}>
             {label.district}
+            {required && <span className="required-mark">*</span>}
           </label>
           <select
             id="district"

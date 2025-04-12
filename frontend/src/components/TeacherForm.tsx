@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { Teacher } from "../types";
 import LocationSelector from "./LocationSelector";
-import { fetchSubjects } from "../utils/subjectUtils";
+import SubjectSelector from "./SubjectSelector";
 
 interface TeacherFormProps {
   onSubmit: (teacher: Teacher) => void;
@@ -45,9 +45,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
 
   // Change this to only show validation errors after submission attempt
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
-
-  const [subjects, setSubjects] = useState<string[]>([]);
-  const [loadingSubjects, setLoadingSubjects] = useState(false);
   
   // Add state to track screen width for responsive design
   const [isMobile, setIsMobile] = useState(false);
@@ -71,39 +68,19 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
     }
   }, []);
 
-  useEffect(() => {
-    const loadSubjects = async () => {
-      setLoadingSubjects(true);
-      try {
-        const subjectList = await fetchSubjects();
-        setSubjects(subjectList);
-      } catch (error) {
-        console.error("Failed to fetch subjects:", error);
-      } finally {
-        setLoadingSubjects(false);
-      }
-    };
-    loadSubjects();
-  }, []);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleCurrentCountyChange = (county: string) => {
-    console.log("County selected in TeacherForm:", county); // Debug log
-    
+  const handleCurrentCountyChange = (county: string) => {    
     // Set state with the county name directly
     setFormData(prevState => {
       const newState = {
         ...prevState,
         current_county: county
       };
-      
-      // Log inside the update callback to see the new state value
-      console.log("New state county value:", newState.current_county);
-      
+
       return newState;
     });
   };
@@ -149,8 +126,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     
-    console.log("Current form data at submission:", formData);
-    
     // Mark that submission was attempted for validation display
     setAttemptedSubmit(true);
     
@@ -173,10 +148,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
       target_counties: cleanCounties.slice(0, minLength),
       target_districts: cleanDistricts.slice(0, minLength)
     };
-    
-    // Log the data being submitted to help debug
-    console.log("Submitting form data:", submissionData);
-    
+
     onSubmit(submissionData);
   };
 
@@ -357,29 +329,14 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
               flex: "1",
               minWidth: isMobile ? "100%" : "200px" // Full width on mobile
             }}>
-              <label htmlFor="subject" style={formStyles.label}>任教科目</label>
-              <select
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                style={{
-                  ...formStyles.input,
-                  height: isMobile ? "48px" : "auto" // Make sure select is tall enough on mobile
+              <SubjectSelector
+                defaultSubject={formData.subject}
+                onSubjectChange={(subject) => {
+                  setFormData({ ...formData, subject });
                 }}
-                required
-                disabled={loadingSubjects}
-              >
-                <option value="">請選擇科目</option>
-                {subjects.map((subject) => (
-                  <option key={subject} value={subject}>
-                    {subject}
-                  </option>
-                ))}
-              </select>
-              {loadingSubjects && (
-                <small style={formStyles.helpText}>載入中...</small>
-              )}
+                required={true}
+                label="任教科目"
+              />
             </div>
           </div>
         </div>
@@ -450,7 +407,10 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
       <div style={{...formStyles.formRow, marginTop: "20px"}}>
         <div style={{...formStyles.formColumn, width: "100%"}}>
           <div style={formStyles.formGroup}>
-            <label htmlFor="email" style={formStyles.label}>電子郵件</label>
+            <label htmlFor="email" style={formStyles.label}>
+              電子郵件
+              <span className="required-mark">*</span>
+            </label>
             <input
               type="email"
               id="email"

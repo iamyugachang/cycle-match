@@ -71,3 +71,8 @@
       font-size: 16px; /* Larger font on mobile for better readability */
     }
   }
+
+  .required-mark {
+    color: #dc3545;
+    margin-left: 4px;
+  }
