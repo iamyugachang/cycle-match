@@ -128,3 +128,26 @@
       font-size: 14px;
     }
   }
+
+.teacher-form .react-select__control {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px;
+  font-size: 14px;
+}
+
+.teacher-form .react-select__menu {
+  z-index: 10;
+}
+
+.teacher-form .react-select__placeholder {
+  color: #aaa;
+}
+
+.teacher-form .react-select__single-value {
+  color: #333;
+}
+
+.teacher-form .react-select__control--is-disabled {
+  background-color: #f5f5f5;
+}

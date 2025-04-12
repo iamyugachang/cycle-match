@@ -55,6 +55,29 @@
     margin-top: 5px;
   }
   
+  .location-selector .react-select__control {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 2px;
+    font-size: 14px;
+  }
+  
+  .location-selector .react-select__menu {
+    z-index: 10;
+  }
+  
+  .location-selector .react-select__placeholder {
+    color: #aaa;
+  }
+  
+  .location-selector .react-select__single-value {
+    color: #333;
+  }
+  
+  .location-selector .react-select__control--is-disabled {
+    background-color: #f5f5f5;
+  }
+  
   /* Responsive styles */
   @media (max-width: 768px) {
     .location-selector-horizontal {

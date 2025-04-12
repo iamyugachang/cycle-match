@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { fetchLocations, getAllCounties, getDistrictsByCounty } from "../utils";
+import Select from "react-select";
 
 interface LocationSelectorProps {
   defaultCounty?: string;
@@ -96,30 +97,24 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     }
   }, [defaultCounty, defaultDistrict, locations, selectedCounty]);
   
-  const handleCountyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const county = e.target.value;
-    
-    // Update local state first
+  const countyOptions = counties.map((county) => ({ value: county, label: county }));
+  const districtOptions = districts.map((district) => ({ value: district, label: district }));
+
+  const handleCountyChange = (selectedOption: { value: string; label: string } | null) => {
+    const county = selectedOption?.value || "";
     setSelectedCounty(county);
-    
-    // Update districts based on selected county
-    const countyDistricts = getDistrictsByCounty(locations, county);
-    setDistricts(countyDistricts);
-    
-    // Reset district selection
+    setDistricts(getDistrictsByCounty(locations, county));
     setSelectedDistrict("");
     onDistrictChange("");
-    
-    // Notify parent component about the change
     onCountyChange(county);
   };
-  
-  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const district = e.target.value;
+
+  const handleDistrictChange = (selectedOption: { value: string; label: string } | null) => {
+    const district = selectedOption?.value || "";
     setSelectedDistrict(district);
     onDistrictChange(district);
   };
-  
+
   if (isLoading) {
     return <div>載入中...</div>;
   }
@@ -144,32 +139,13 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
             {label.county}
             {required && <span className="required-mark">*</span>}
           </label>
-          <select
+          <Select
             id="county"
-            value={selectedCounty}
+            options={countyOptions}
+            value={countyOptions.find((option) => option.value === selectedCounty)}
             onChange={handleCountyChange}
-            required={required}
-            style={{
-              width: "100%",
-              padding: "8px",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              backgroundColor: "#fff"
-            }}
-          >
-            <option value="">請選擇縣市</option>
-            {counties.map(county => (
-              <option key={county} value={county}>
-                {county}
-              </option>
-            ))}
-          </select>
-          
-          {/* Debug display for selected value */}
-          <input 
-            type="hidden" 
-            name="debug_county" 
-            value={selectedCounty} 
+            isClearable
+            placeholder="請選擇縣市"
           />
         </div>
         
@@ -181,27 +157,15 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
             {label.district}
             {required && <span className="required-mark">*</span>}
           </label>
-          <select
+          <Select
             id="district"
-            value={selectedDistrict}
+            options={districtOptions}
+            value={districtOptions.find((option) => option.value === selectedDistrict)}
             onChange={handleDistrictChange}
-            disabled={!selectedCounty}
-            required={required}
-            style={{
-              width: "100%",
-              padding: "8px",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              backgroundColor: selectedCounty ? "#fff" : "#f5f5f5"
-            }}
-          >
-            <option value="">請選擇區域</option>
-            {districts.map(district => (
-              <option key={district} value={district}>
-                {district}
-              </option>
-            ))}
-          </select>
+            isDisabled={!selectedCounty}
+            isClearable
+            placeholder="請選擇區域"
+          />
         </div>
       </div>
     </div>

@@ -41,7 +41,7 @@ const TeacherProfilePage: React.FC<TeacherProfilePageProps> = ({
           onClick={onBackToForm}
           style={{ padding: '10px 20px', fontSize: '1rem' }}
         >
-          返回首頁填寫介聘資料
+          返回表單填寫介聘資料
         </button>
       </div>
     );

@@ -1,7 +1,8 @@
 import { useState, useEffect, FormEvent } from "react";
 import { Teacher } from "../types";
 import LocationSelector from "./LocationSelector";
-import SubjectSelector from "./SubjectSelector";
+import { fetchSubjects } from "../utils/subjectUtils";
+import Select from "react-select";
 
 interface TeacherFormProps {
   onSubmit: (teacher: Teacher) => void;
@@ -262,6 +263,12 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
     }
   };
 
+  const subjectOptions = subjects.map((subject) => ({ value: subject, label: subject }));
+
+  const handleSubjectChange = (selectedOption: { value: string; label: string } | null) => {
+    setFormData({ ...formData, subject: selectedOption?.value || "" });
+  };
+
   return (
     <form onSubmit={handleSubmit} style={formStyles.container}>
       {/* Row 1: Current School Section Header */}
@@ -329,14 +336,18 @@ const TeacherForm: React.FC<TeacherFormProps> = ({
               flex: "1",
               minWidth: isMobile ? "100%" : "200px" // Full width on mobile
             }}>
-              <SubjectSelector
-                defaultSubject={formData.subject}
-                onSubjectChange={(subject) => {
-                  setFormData({ ...formData, subject });
-                }}
-                required={true}
-                label="任教科目"
+              <label htmlFor="subject" style={formStyles.label}>任教科目</label>
+              <Select
+                id="subject"
+                options={subjectOptions}
+                value={subjectOptions.find((option) => option.value === formData.subject)}
+                onChange={handleSubjectChange}
+                isDisabled={loadingSubjects}
+                placeholder="請選擇科目"
               />
+              {loadingSubjects && (
+                <small style={formStyles.helpText}>載入中...</small>
+              )}
             </div>
           </div>
         </div>
