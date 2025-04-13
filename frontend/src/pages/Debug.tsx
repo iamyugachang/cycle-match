@@ -11,9 +11,6 @@ const { Title, Text, Paragraph } = Typography;
 const { Password } = Input;
 const { TabPane } = Tabs;
 
-// Debug password - should ideally come from an environment variable
-const DEBUG_PASSWORD = import.meta.env.DEBUG_AUTH || '';
-
 const Debug: React.FC = () => {
   const navigate = useNavigate();
   const userVM = useUserViewModel();
@@ -26,7 +23,11 @@ const Debug: React.FC = () => {
   const [debugGoogleId, setDebugGoogleId] = useState('debug-user-123');
   const [userViewMode, setUserViewMode] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
-
+  
+  // Read debug password from environment variable
+  // Note: Make sure VITE_DEBUG_AUTH is in a .env file in the root directory
+  const DEBUG_PASSWORD = import.meta.env.VITE_DEBUG_AUTH || '';
+  
   useEffect(() => {
     const storedAuth = localStorage.getItem('debug_authenticated');
     if (storedAuth === 'true') {
@@ -35,16 +36,6 @@ const Debug: React.FC = () => {
       matchVM.enableDebugMode();
     }
     setCheckingAuth(false);
-  }, []);
-  
-  // Check if already authenticated from localStorage
-  useEffect(() => {
-    const storedAuth = localStorage.getItem('debug_authenticated');
-    if (storedAuth === 'true') {
-      setIsAuthenticated(true);
-      // Enable debug mode in the MatchViewModel
-      matchVM.enableDebugMode();
-    }
   }, []);
   
   // Set user view mode based on MatchViewModel
@@ -183,6 +174,11 @@ const Debug: React.FC = () => {
           showIcon
           icon={<BugOutlined />}
           style={{ marginBottom: 16 }}
+          action={
+            <Button danger onClick={handleExit}>
+              Exit Debug Mode
+            </Button>
+          }
         />
         
         <Tabs 
@@ -190,7 +186,7 @@ const Debug: React.FC = () => {
           onChange={setActiveTab}
           type="card"
         >
-          <TabPane tab="Debug Actions" key="1">
+          <Tabs.TabPane tab="Debug Actions" key="1">
             <Card title="Debug Controls">
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <Paragraph>
@@ -264,9 +260,9 @@ const Debug: React.FC = () => {
                 </Button>
               </Space>
             </Card>
-          </TabPane>
+          </Tabs.TabPane>
           
-          <TabPane tab="System Status" key="2">
+          <Tabs.TabPane tab="System Status" key="2">
             <Card title="Current System State">
               <Space direction="vertical" style={{ width: '100%' }}>
                 <Divider orientation="left">User Info</Divider>
@@ -352,9 +348,9 @@ const Debug: React.FC = () => {
                 </List>
               </Space>
             </Card>
-          </TabPane>
+          </Tabs.TabPane>
           
-          <TabPane tab="API Test" key="3">
+          <Tabs.TabPane tab="API Test" key="3">
             <Card title="API Test Tools">
               <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <Paragraph>
@@ -402,7 +398,7 @@ const Debug: React.FC = () => {
                 </Button>
               </Space>
             </Card>
-          </TabPane>
+          </Tabs.TabPane>
         </Tabs>
       </Space>
     </SharedLayout>

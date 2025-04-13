@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Button, Dropdown, Space, Switch, Typography, Card, Badge, Tooltip } from 'antd';
-import { BugOutlined, EyeOutlined, UserOutlined, SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { BugOutlined, EyeOutlined, UserOutlined, SettingOutlined, InfoCircleOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
 
@@ -12,6 +12,7 @@ interface DebugToolsProps {
   toggleUserView: () => void;
   onViewAllMatches: () => void;
   onDebugLogin: () => void;
+  onExitDebugMode?: () => void;
 }
 
 const DebugTools: React.FC<DebugToolsProps> = ({
@@ -19,7 +20,8 @@ const DebugTools: React.FC<DebugToolsProps> = ({
   userView,
   toggleUserView,
   onViewAllMatches,
-  onDebugLogin
+  onDebugLogin,
+  onExitDebugMode
 }) => {
   const navigate = useNavigate();
   const [isDebugAuthenticated, setIsDebugAuthenticated] = useState(false);
@@ -31,7 +33,12 @@ const DebugTools: React.FC<DebugToolsProps> = ({
     setIsDebugAuthenticated(storedAuth === 'true');
   }, []);
   
-  // Debug dropdown items - full set when authenticated
+  // If not in debug mode and not authenticated, don't render anything
+  if (!isDebugMode && !isDebugAuthenticated) {
+    return null;
+  }
+  
+  // Debug dropdown items
   const debugItems: MenuProps['items'] = [
     {
       key: 'debugPage',
@@ -56,12 +63,24 @@ const DebugTools: React.FC<DebugToolsProps> = ({
       icon: <UserOutlined />,
       onClick: onDebugLogin,
       disabled: !isDebugAuthenticated
+    },
+    {
+      key: 'divider2',
+      type: 'divider',
+    },
+    {
+      key: 'exitDebugMode',
+      label: '退出調試模式',
+      icon: <LogoutOutlined />,
+      onClick: onExitDebugMode,
+      danger: true,
+      disabled: !isDebugAuthenticated
     }
   ];
 
   return (
     <>
-      {/* Floating Debug Button - Always visible */}
+      {/* Floating Debug Button - Only visible when authenticated or in debug mode */}
       <div 
         style={{ 
           position: 'fixed', 

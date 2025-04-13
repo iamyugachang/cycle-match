@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card, Typography, Space, Layout, Alert } from 'antd';
 import WelcomeBanner from '../components/WelcomeBanner';
 import { useUserViewModel } from '../viewmodels/UserViewModel';
-import AnnouncementBanner from '../components/AnnouncementBanner';
 
 const { Content, Footer } = Layout;
 const { Title, Text } = Typography;
@@ -45,7 +44,6 @@ const Login: React.FC = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Content style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          <AnnouncementBanner />
           
           {error && <Alert message={error} type="error" showIcon />}
           

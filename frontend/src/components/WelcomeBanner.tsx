@@ -40,7 +40,7 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({ onSuccess, onError }) => 
             {
               title: '登入',
               description: (
-                <div style={{ marginTop: '10px' }}>
+                <div style={{ display: 'flex', textAlign: 'left', width: '200px', maxWidth: '200%' }}>
                   <GoogleLogin
                     onSuccess={onSuccess}
                     onError={onError}

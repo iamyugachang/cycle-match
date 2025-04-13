@@ -45,8 +45,6 @@ const Home: React.FC = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Content style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          <AnnouncementBanner />
-          
           <WelcomeBanner 
             onSuccess={handleLoginSuccess}
             onError={handleLoginError}

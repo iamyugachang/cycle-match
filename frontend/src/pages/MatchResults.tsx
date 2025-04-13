@@ -80,7 +80,13 @@ const MatchResults: React.FC = () => {
     const debugGoogleId = 'debug-user-123';
     userVM.debugLogin(debugGoogleId);
   };
-  
+
+  const handleExitDebugMode = () => {
+    localStorage.removeItem('debug_authenticated');
+    matchVM.disableDebugMode();
+    navigate('/');
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ 
@@ -144,6 +150,7 @@ const MatchResults: React.FC = () => {
             toggleUserView={matchVM.toggleUserView}
             onViewAllMatches={handleViewAllMatches}
             onDebugLogin={handleDebugLogin}
+            onExitDebugMode={handleExitDebugMode}
           />
           
           {initialLoading ? (
