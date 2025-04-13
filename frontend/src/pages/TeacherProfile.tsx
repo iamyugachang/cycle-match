@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Typography, Space } from 'antd';
 import { useUserViewModel } from '../viewmodels/UserViewModel';
+import { useMatchViewModel } from '../viewmodels/MatchViewModel';
 import { Teacher } from '../types';
 import TeacherProfilePage from '../components/TeacherProfilePage';
 import TeacherFormContainer from '../components/TeacherFormContainer';
 import EditTeacherForm from '../components/EditTeacherForm';
 import UserHeader from '../components/UserHeader';
 import AnnouncementBanner from '../components/AnnouncementBanner';
+import DebugTools from '../components/DebugTools';
 import ApiService from '../services/ApiService';
 
 const { Header, Content, Footer } = Layout;
@@ -16,6 +18,7 @@ const { Title } = Typography;
 const TeacherProfile: React.FC = () => {
   const navigate = useNavigate();
   const userVM = useUserViewModel();
+  const matchVM = useMatchViewModel(userVM.currentTeacher, userVM.allTeachers);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -81,6 +84,18 @@ const TeacherProfile: React.FC = () => {
     navigate('/login');
   };
   
+  // Debug handlers
+  const handleViewAllMatches = () => {
+    matchVM.enableDebugMode();
+    matchVM.fetchMatches();
+    navigate('/matches');
+  };
+  
+  const handleDebugLogin = () => {
+    const debugGoogleId = 'debug-user-123';
+    userVM.debugLogin(debugGoogleId);
+  };
+  
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ 
@@ -109,6 +124,15 @@ const TeacherProfile: React.FC = () => {
       <Content style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <AnnouncementBanner />
+          
+          {/* Add Debug Tools */}
+          <DebugTools
+            isDebugMode={matchVM.isDebugMode}
+            userView={matchVM.userView}
+            toggleUserView={matchVM.toggleUserView}
+            onViewAllMatches={handleViewAllMatches}
+            onDebugLogin={handleDebugLogin}
+          />
           
           {showForm ? (
             <TeacherFormContainer

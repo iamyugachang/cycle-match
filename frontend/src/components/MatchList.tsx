@@ -121,7 +121,7 @@ const MatchList: React.FC<MatchListProps> = ({
           <Button onClick={onBackToForm} icon={<ArrowLeftOutlined />} size="small">返回</Button>
         </div>
       }
-      bodyStyle={{ padding: '12px' }}
+      styles={{ body: { padding: '12px' } }}
     >
       <Tabs 
         items={items} 

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { Spin } from 'antd';
+import { Spin, Typography } from 'antd';
 import { useUserViewModel } from '../viewmodels/UserViewModel';
+
+const { Text } = Typography;
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -21,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       if (token && googleId && !userVM.userInfo) {
         try {
           // Get user data based on stored Google ID
-          const teachers = await userVM.debugLogin(googleId);
+          await userVM.debugLogin(googleId);
           setCheckingAuth(false);
         } catch (error) {
           console.error('Failed to restore auth:', error);
@@ -46,7 +48,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         alignItems: 'center', 
         height: '100vh' 
       }}>
-        <Spin size="large" tip="驗證登入狀態..." />
+        <Spin size="large">
+          <div style={{ padding: '50px', textAlign: 'center' }}>
+            <Text type="secondary">驗證登入狀態...</Text>
+          </div>
+        </Spin>
       </div>
     );
   }

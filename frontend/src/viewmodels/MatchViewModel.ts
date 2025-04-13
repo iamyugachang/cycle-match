@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MatchResult, Teacher } from '../types';
 import { isUserInvolved, sortMatches, getVisibleMatches } from '../utils/matchUtils';
 import ApiService from '../services/ApiService';
@@ -10,6 +10,14 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [userView, setUserView] = useState(false);
   const [teacherInfo, setTeacherInfo] = useState<{id: number | undefined, email: string, isOpen: boolean} | null>(null);
+  
+  // Check for debug authentication from localStorage
+  useEffect(() => {
+    const debugAuthenticated = localStorage.getItem('debug_authenticated') === 'true';
+    if (debugAuthenticated) {
+      setIsDebugMode(true);
+    }
+  }, []);
   
   // Get current Taiwanese year
   const currentYear = new Date().getFullYear() - 1911;
@@ -117,6 +125,7 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
   // Debug mode and user view toggle
   const enableDebugMode = () => {
     setIsDebugMode(true);
+    // Default to all matches view when enabling debug mode
     setUserView(false);
   };
   
@@ -133,7 +142,9 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
   };
 
   // Check if in user view mode
-  const isUserViewActive = () => isDebugMode && userView;
+  const isUserViewActive = () => {
+    return isDebugMode && userView;
+  };
   
   // Get title based on current view mode
   const getViewModeTitle = () => {
@@ -160,7 +171,6 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
     disableDebugMode,
     toggleUserView,
     isUserViewActive,
-    getViewModeTitle,
-    setIsDebugMode
+    getViewModeTitle
   };
 };

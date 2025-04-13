@@ -8,6 +8,7 @@ import TeacherProfile from './pages/TeacherProfile';
 import MatchResults from './pages/MatchResults';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
+import Debug from './pages/Debug'; // Import the Debug page
 import ProtectedRoute from './components/ProtectedRoute';
 
 const App: React.FC = () => {
@@ -30,6 +31,9 @@ const App: React.FC = () => {
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Home />} />
+            
+            {/* Debug route */}
+            <Route path="/debug" element={<Debug />} />
             
             {/* Protected routes */}
             <Route path="/profile" element={
