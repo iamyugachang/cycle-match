@@ -11,6 +11,7 @@ export const useUserViewModel = () => {
   const [error, setError] = useState("");
   
   // Try to restore user session from localStorage on mount
+  // Inside the useEffect at the beginning of the hook
   useEffect(() => {
     const storedUserInfo = localStorage.getItem('user_info');
     if (storedUserInfo) {
@@ -23,9 +24,12 @@ export const useUserViewModel = () => {
           if (parsedUserInfo.google_id) {
             try {
               const teachers = await ApiService.getTeachersByGoogleId(parsedUserInfo.google_id);
-              setAllTeachers(teachers);
-              if (teachers.length > 0) {
+              
+              if (teachers && teachers.length > 0) {
+                setAllTeachers(teachers);
                 setCurrentTeacher(teachers[0]);
+              } else {
+                console.warn("No teachers found for user");
               }
             } catch (err) {
               console.error("Failed to restore teacher data:", err);
@@ -52,13 +56,11 @@ export const useUserViewModel = () => {
       // Update user info
       setUserInfo(data.userInfo);
       
-      // Set all associated teacher records
+      // Set all associated teacher records - ensure this is working
       setAllTeachers(data.teachers);
       
       // Set current teacher (first one by default or specified teacher)
-      if (data.teacher) {
-        setCurrentTeacher(data.teacher);
-      } else if (data.teachers.length > 0) {
+      if (data.teachers.length > 0) {
         setCurrentTeacher(data.teachers[0]);
       }
 

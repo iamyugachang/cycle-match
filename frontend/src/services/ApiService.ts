@@ -24,11 +24,11 @@ export class ApiService {
         },
         body: JSON.stringify({ token }),
       });
-
+  
       if (!response.ok) {
         throw new Error(`Google 登入驗證失敗: ${response.status}`);
       }
-
+  
       const data = await response.json();
       
       // Format the response to meet our UserResponse interface
@@ -59,8 +59,10 @@ export class ApiService {
         throw new Error(`獲取教師資料失敗: ${response.status}`);
       }
       
-      return await response.json();
+      const data = await response.json();
+      return data;
     } catch (error) {
+      console.error("Error fetching teachers:", error);
       throw new Error(handleApiError(error, '獲取教師資料失敗，請稍後再試'));
     }
   }

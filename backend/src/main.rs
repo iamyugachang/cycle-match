@@ -95,16 +95,25 @@ async fn get_teachers(
     State(pool): State<Pool<Postgres>>,
     Query(params): Query<HashMap<String, String>>,
 ) -> Json<Vec<Teacher>> {
-    // 檢查是否有 google_id 參數
+    // Log the parameters for debugging
+    tracing::info!("Get teachers params: {:?}", params);
+    
+    // Check if we have google_id parameter
     if let Some(google_id) = params.get("google_id") {
-        // 根據 google_id 查詢
-        if let Ok(teacher) = db::get_teacher_by_google_id(&pool, google_id).await {
-            return Json(vec![teacher]);
+        // Try to get all teachers for this Google ID
+        match db::get_teachers_by_google_id(&pool, google_id).await {
+            Ok(teachers) => {
+                tracing::info!("Found {} teachers for Google ID {}", teachers.len(), google_id);
+                return Json(teachers);
+            }
+            Err(e) => {
+                tracing::error!("Error getting teachers by Google ID: {}", e);
+                return Json(vec![]);
+            }
         }
-        return Json(vec![]);
     }
 
-    // 無 google_id 參數時獲取所有教師
+    // No google_id parameter - get all teachers
     let teachers = db::get_all_teachers(&pool)
         .await
         .unwrap_or_default();

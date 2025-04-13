@@ -25,6 +25,30 @@ const TeacherProfile: React.FC = () => {
   
   // Current ROC year calculation
   const currentYear = new Date().getFullYear() - 1911;
+
+  useEffect(() => {
+    // Check if we have auth token in localStorage but no userInfo
+    const checkAuth = async () => {
+      const token = localStorage.getItem('auth_token');
+      const googleId = localStorage.getItem('google_id');
+      
+      if (token && googleId) {
+        try {
+          // Get all user teacher data
+          const teachers = await ApiService.getTeachersByGoogleId(googleId);
+          userVM.setAllTeachers(teachers);
+          
+          if (teachers.length > 0) {
+            userVM.setCurrentTeacher(teachers[0]);
+          }
+        } catch (error) {
+          console.error('Failed to load teacher data:', error);
+        }
+      }
+    };
+    
+    checkAuth();
+  }, []);
   
   // If all teachers is empty and not showing form, show form
   useEffect(() => {

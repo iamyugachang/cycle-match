@@ -10,6 +10,7 @@ const { Title, Text } = Typography;
 interface MatchListProps {
   matches: MatchResult[];
   currentTeacher: Teacher | null;
+  allTeachers: Teacher[];
   onShowTeacherInfo: (id: number | undefined, email: string) => void;
   onBackToForm: () => void;
   title?: string;
@@ -20,6 +21,7 @@ interface MatchListProps {
 const MatchList: React.FC<MatchListProps> = ({
   matches,
   currentTeacher,
+  allTeachers,
   onShowTeacherInfo,
   onBackToForm,
   title = "配對結果",
@@ -27,9 +29,11 @@ const MatchList: React.FC<MatchListProps> = ({
   loading = false
 }) => {
   // Filter matches for the current teacher
-  const userMatches = currentTeacher
-    ? matches.filter(match => isUserInvolved(match, currentTeacher))
-    : [];
+  const userMatches = matches.filter(match => 
+    match.teachers.some(matchTeacher => 
+      allTeachers.some(userTeacher => userTeacher.id === matchTeacher.id)
+    )
+  );
   
   // If no matches are found, show the "not found" message
   if (userMatches.length === 0 && !isDebugMode && !loading) {

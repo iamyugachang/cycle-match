@@ -22,6 +22,14 @@ const MatchResults: React.FC = () => {
   
   // Current ROC year calculation
   const currentYear = new Date().getFullYear() - 1911;
+
+  useEffect(() => {
+    // When current teacher changes, refresh the match display
+    if (userVM.currentTeacher && matchVM.matches.length > 0) {
+      // This will trigger a re-render with the correct filtered matches
+      matchVM.getFilteredMatches();
+    }
+  }, [userVM.currentTeacher?.id]);
   
   // Fetch matches when component mounts
   useEffect(() => {
@@ -133,7 +141,9 @@ const MatchResults: React.FC = () => {
               onClick={toggleTeacherSwitcher}
               style={{ fontSize: '12px', maxWidth: '70%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
             >
-              {userVM.currentTeacher?.current_school || '選擇學校'} <SwapOutlined />
+              {userVM.currentTeacher?.current_county || '選擇學校'} • {}
+              {userVM.currentTeacher?.current_district} • {}
+              {userVM.currentTeacher?.current_school} <SwapOutlined />
             </Button>
           </div>
         )}
@@ -161,6 +171,7 @@ const MatchResults: React.FC = () => {
             <MatchList
               matches={matchVM.getFilteredMatches()}
               currentTeacher={userVM.currentTeacher}
+              allTeachers={userVM.allTeachers}
               onShowTeacherInfo={matchVM.showTeacherInfo}
               onBackToForm={handleBackToForm}
               title={`${currentYear}年度配對結果`}

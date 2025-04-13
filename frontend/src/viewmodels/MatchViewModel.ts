@@ -87,22 +87,25 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
     
     // If debug mode with user view enabled, show only matches for current teacher
     if (isDebugMode && userView) {
-      return getVisibleMatches(yearMatches, false, currentTeacher);
+      // Only show matches involving the current teacher
+      return yearMatches.filter(match => 
+        match.teachers.some(teacher => currentTeacher && teacher.id === currentTeacher.id)
+      );
     }
     
     // Debug mode shows all matches
-    if (isDebugMode) {
+    if (isDebugMode && !userView) {
       return yearMatches;
     }
     
-    // Normal mode: show matches involving any of the user's teachers
-    if (allTeachers.length === 0) {
+    // Normal mode: only show matches for the current teacher
+    if (!currentTeacher) {
       return [];
     }
     
-    // Filter matches involving any of the user's teachers
+    // Only show matches involving the current teacher
     return yearMatches.filter(match => 
-      allTeachers.some(teacher => isUserInvolved(match, teacher))
+      match.teachers.some(teacher => teacher.id === currentTeacher.id)
     );
   };
 
