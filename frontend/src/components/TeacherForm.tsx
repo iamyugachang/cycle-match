@@ -13,15 +13,20 @@ interface TeacherFormProps {
   defaultEmail?: string;
   initialData?: Teacher; // For edit mode
   isEditing?: boolean;
+  form?: any; // Optional form prop to allow parent components to control the form
 }
 
 const TeacherForm: React.FC<TeacherFormProps> = ({ 
   onSubmit, 
   defaultEmail = "", 
   initialData, 
-  isEditing = false 
+  isEditing = false,
+  form: externalForm 
 }) => {
-  const [form] = Form.useForm();
+  // Use the external form if provided, otherwise create a new one
+  const [internalForm] = Form.useForm();
+  const form = externalForm || internalForm;
+  
   const currentYear = new Date().getFullYear() - 1911;
   
   // Add state for locations and subjects

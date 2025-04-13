@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Typography, Space } from 'antd';
-import { useUserViewModel } from '../viewmodels/UserViewModel';
+import { Card, Typography, Space, Layout, Alert } from 'antd';
 import WelcomeBanner from '../components/WelcomeBanner';
+import { useUserViewModel } from '../viewmodels/UserViewModel';
 import AnnouncementBanner from '../components/AnnouncementBanner';
 
 const { Content, Footer } = Layout;
-const { Text } = Typography;
+const { Title, Text } = Typography;
 
-const Home: React.FC = () => {
+const Login: React.FC = () => {
   const navigate = useNavigate();
   const userVM = useUserViewModel();
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   
   // Handle login success
   const handleLoginSuccess = async (credentialResponse: any) => {
@@ -34,7 +34,7 @@ const Home: React.FC = () => {
     }
   };
   
-  // Handle login error
+  // Handle login failure
   const handleLoginError = (error: any) => {
     console.error('Login error:', error);
     setError('登入失敗，請稍後再試');
@@ -46,6 +46,8 @@ const Home: React.FC = () => {
       <Content style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <AnnouncementBanner />
+          
+          {error && <Alert message={error} type="error" showIcon />}
           
           <WelcomeBanner 
             onSuccess={handleLoginSuccess}
@@ -66,4 +68,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default Login;

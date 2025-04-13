@@ -24,6 +24,22 @@ export default defineConfig({
       },
     },
   },
+  // Add base configuration for proper routing
+  base: '/',
+  // Configure build options
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    // Add these settings for SPA routing
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          antd: ['antd'],
+        },
+      },
+    },
+  },
   define: {
     // Define environment variables 
     'process.env.NEXT_PUBLIC_API_URL': JSON.stringify(process.env.VITE_API_URL || 'http://localhost:8000'),

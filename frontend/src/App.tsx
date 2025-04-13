@@ -1,12 +1,17 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ConfigProvider } from 'antd';
 import zhTW from 'antd/locale/zh_TW';
 import Home from './pages/Home';
+import TeacherProfile from './pages/TeacherProfile';
+import MatchResults from './pages/MatchResults';
+import Login from './pages/Login';
+import NotFound from './pages/NotFound';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App: React.FC = () => {
-  // You can replace this with your actual Google client ID from your environment variables
+  // Get Google client ID from environment variable
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
   return (
@@ -22,8 +27,24 @@ const App: React.FC = () => {
       <GoogleOAuthProvider clientId={googleClientId}>
         <BrowserRouter>
           <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
             <Route path="/" element={<Home />} />
-            {/* Add additional routes as needed */}
+            
+            {/* Protected routes */}
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <TeacherProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/matches" element={
+              <ProtectedRoute>
+                <MatchResults />
+              </ProtectedRoute>
+            } />
+            
+            {/* Fallback route */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </GoogleOAuthProvider>

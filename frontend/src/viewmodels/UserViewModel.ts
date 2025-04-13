@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Teacher, UserInfo, UserResponse } from '../types';
 import ApiService from '../services/ApiService';
 
@@ -9,6 +9,36 @@ export const useUserViewModel = () => {
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null); // Track which teacher is being edited
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  // Try to restore user session from localStorage on mount
+  useEffect(() => {
+    const storedUserInfo = localStorage.getItem('user_info');
+    if (storedUserInfo) {
+      try {
+        const parsedUserInfo = JSON.parse(storedUserInfo);
+        setUserInfo(parsedUserInfo);
+        
+        // Fetch teacher data for this user
+        const fetchTeachersData = async () => {
+          if (parsedUserInfo.google_id) {
+            try {
+              const teachers = await ApiService.getTeachersByGoogleId(parsedUserInfo.google_id);
+              setAllTeachers(teachers);
+              if (teachers.length > 0) {
+                setCurrentTeacher(teachers[0]);
+              }
+            } catch (err) {
+              console.error("Failed to restore teacher data:", err);
+            }
+          }
+        };
+        
+        fetchTeachersData();
+      } catch (err) {
+        console.error("Failed to parse stored user info:", err);
+      }
+    }
+  }, []);
   
   const handleGoogleLoginSuccess = async (credentialResponse: any) => {
     const token = credentialResponse.credential;
@@ -51,8 +81,12 @@ export const useUserViewModel = () => {
     setUserInfo(null);
     setCurrentTeacher(null);
     setAllTeachers([]);
-    // Reload page to reset Google Login state
-    window.location.reload();
+    setEditingTeacher(null);
+    
+    // Clear localStorage
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('google_id');
+    localStorage.removeItem('user_info');
   };
 
   // Switch between teacher records for the same user

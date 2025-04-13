@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Button, Typography, Space, Alert, Spin } from 'antd';
+import { Card, Button, Typography, Space, Alert, Spin, Form } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import TeacherForm from './TeacherForm';
 import { Teacher } from '../types';
@@ -21,6 +21,9 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
   loading,
   error
 }) => {
+  // Create a form instance to control the form
+  const [form] = Form.useForm();
+  
   // Get current ROC year
   const currentYear = new Date().getFullYear() - 1911;
   
@@ -48,6 +51,7 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
             defaultEmail={teacher.email}
             initialData={teacher}
             isEditing={true}
+            form={form}
           />
         </Spin>
       </Space>
