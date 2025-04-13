@@ -42,7 +42,7 @@ const DebugTools: React.FC<DebugToolsProps> = ({
   const debugItems: MenuProps['items'] = [
     {
       key: 'debugPage',
-      label: '開啟調試頁面',
+      label: '開啟 Debug 頁面',
       icon: <SettingOutlined />,
       onClick: () => navigate('/debug')
     },
@@ -70,7 +70,7 @@ const DebugTools: React.FC<DebugToolsProps> = ({
     },
     {
       key: 'exitDebugMode',
-      label: '退出調試模式',
+      label: '退出 Debug 模式',
       icon: <LogoutOutlined />,
       onClick: onExitDebugMode,
       danger: true,
@@ -136,7 +136,7 @@ const DebugTools: React.FC<DebugToolsProps> = ({
               <Space>
                 <BugOutlined style={{ color: '#52c41a' }} />
                 <Text strong style={{ color: '#52c41a' }}>
-                  調試模式已啟用
+                  Debug Mode 已啟用
                 </Text>
               </Space>
               <Button 
@@ -144,7 +144,7 @@ const DebugTools: React.FC<DebugToolsProps> = ({
                 size="small" 
                 onClick={() => navigate('/debug')}
               >
-                調試設置
+                Debug Config.
               </Button>
             </div>
             

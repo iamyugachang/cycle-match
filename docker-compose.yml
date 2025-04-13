@@ -5,15 +5,15 @@ services:
     image: postgres:15
     container_name: circlematch-db
     environment:
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: circlematch
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${PROD_DB_NAME}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app"]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -29,7 +29,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgres://app:password@db:5432/circlematch
+      DATABASE_URL: ${DATABASE_URL}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     depends_on:
@@ -47,8 +47,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      VITE_API_URL: http://localhost:8000
+      VITE_API_URL: ${API_URL}
       VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      VITE_DEBUG_AUTH: ${VITE_DEBUG_AUTH}
     volumes:
       - ./frontend:/app
       - /app/node_modules
