@@ -2,6 +2,9 @@
 
 A matching platform designed for Taiwan's teachers, helping them find bilateral, triangular, or multi-node transfer opportunities, making teacher transfers more efficient and convenient.
 
+## Demo
+[![Cycle Match Demo on local](https://cdn.loom.com/sessions/thumbnails/320e245d4ae4429699ec673a09967d7a-with-play.gif)](https://www.loom.com/share/320e245d4ae4429699ec673a09967d7a?sid=cf9f7926-a3cf-4350-b5ed-85cfeefe73b2)
+
 ## System Architecture
 
 ```mermaid
