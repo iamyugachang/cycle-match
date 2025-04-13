@@ -1,0 +1,93 @@
+/* MatchCard.module.css */
+
+.matchCard {
+    border-radius: 8px;
+    margin-bottom: 12px;
+    transition: transform 0.2s ease;
+    overflow: hidden;
+  }
+  
+  .matchCard:active {
+    transform: scale(0.98);
+  }
+  
+  .highlightedCard {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+  }
+  
+  .cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .teacherRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .teacherRow:active {
+    background-color: #f0f0f0;
+  }
+  
+  .currentUserRow {
+    background-color: #f0f5ff;
+    border: 1px solid #d6e4ff;
+  }
+  
+  .teacherInfo {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .schoolInfo {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+  
+  .arrowContainer {
+    display: flex;
+    justify-content: center;
+    margin: 4px 0;
+    color: #bfbfbf;
+  }
+  
+  .timeStamp {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+    text-align: right;
+    margin-top: 8px;
+  }
+  
+  .userTag {
+    margin-left: 4px;
+  }
+  
+  .teacherBadge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .infoIcon {
+    color: #1890ff;
+    font-size: 16px;
+  }
+  
+  /* For small screens */
+  @media (max-width: 576px) {
+    .matchCard {
+      margin-bottom: 8px;
+    }
+  
+    .teacherRow {
+      padding: 6px;
+    }
+  }

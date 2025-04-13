@@ -1,10 +1,11 @@
 import React from 'react';
-import { Card, Typography, Button, Table, Empty, Tabs, Tag, Space } from 'antd';
+import { Card, Typography, Button, Empty, Tabs, Space, Spin, Segmented, Badge } from 'antd';
 import { InfoCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { MatchResult, Teacher } from "../types";
-import { getMatchTypeName, isUserInvolved } from "../utils/matchUtils";
+import { isUserInvolved, getMatchTypeName } from "../utils/matchUtils";
+import MatchCard from './MatchCard'; // Use our updated MatchCard component
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 interface MatchListProps {
   matches: MatchResult[];
@@ -13,6 +14,7 @@ interface MatchListProps {
   onBackToForm: () => void;
   title?: string;
   isDebugMode?: boolean;
+  loading?: boolean;
 }
 
 const MatchList: React.FC<MatchListProps> = ({
@@ -21,82 +23,22 @@ const MatchList: React.FC<MatchListProps> = ({
   onShowTeacherInfo,
   onBackToForm,
   title = "配對結果",
-  isDebugMode = false
+  isDebugMode = false,
+  loading = false
 }) => {
   // Filter matches for the current teacher
   const userMatches = currentTeacher
     ? matches.filter(match => isUserInvolved(match, currentTeacher))
     : [];
-
-  const columns = [
-    {
-      title: '教師',
-      dataIndex: 'displayId',
-      key: 'displayId',
-      render: (_: string, record: any) => (
-        <Typography.Text strong={record.isCurrentUser}>
-          {record.displayId}
-          {record.isCurrentUser && <Tag color="blue" style={{ marginLeft: 8 }}>您</Tag>}
-        </Typography.Text>
-      )
-    },
-    {
-      title: '現任學校',
-      dataIndex: 'currentSchool',
-      key: 'currentSchool',
-    },
-    {
-      title: '目標調往區域',
-      dataIndex: 'targetArea',
-      key: 'targetArea',
-    },
-    {
-      title: '任教科目',
-      dataIndex: 'subject',
-      key: 'subject',
-    },
-    {
-      title: '資訊',
-      key: 'info',
-      width: 80,
-      render: (_: any, record: any) => (
-        <Button 
-          icon={<InfoCircleOutlined />} 
-          shape="circle" 
-          size="small"
-          onClick={() => onShowTeacherInfo(record.id, record.email)}
-        />
-      ),
-    },
-  ];
-
-  // Function to transform match data for table display
-  const getMatchTableData = (match: MatchResult) => {
-    return match.teachers.map((teacher, idx) => {
-      const nextTeacher = match.teachers[(idx + 1) % match.teachers.length];
-      const isCurrentUser = currentTeacher && teacher.id === currentTeacher.id;
-      
-      return {
-        key: `${match.id}-${teacher.id}`,
-        id: teacher.id,
-        email: teacher.email,
-        displayId: teacher.display_id || `${teacher.current_county}${teacher.current_district}#${teacher.id}`,
-        currentSchool: `${teacher.current_county} • ${teacher.current_district} • ${teacher.current_school}`,
-        targetArea: `${nextTeacher.current_county} • ${nextTeacher.current_district}`,
-        subject: teacher.subject || "未指定",
-        isCurrentUser
-      };
-    });
-  };
-
+  
   // If no matches are found, show the "not found" message
-  if (userMatches.length === 0 && !isDebugMode) {
+  if (userMatches.length === 0 && !isDebugMode && !loading) {
     return (
       <Card
         title={
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Title level={4} style={{ margin: 0 }}>{title}</Title>
-            <Button onClick={onBackToForm} icon={<ArrowLeftOutlined />}>返回表單</Button>
+            <Title level={5} style={{ margin: 0 }}>{title}</Title>
+            <Button onClick={onBackToForm} icon={<ArrowLeftOutlined />} size="small">返回</Button>
           </div>
         }
       >
@@ -109,32 +51,35 @@ const MatchList: React.FC<MatchListProps> = ({
     );
   }
 
+  // Generate tabs items for user matches and all matches (debug mode)
   const items = [
     {
       key: 'userMatches',
-      label: '您的配對',
-      children: userMatches.length > 0 ? (
-        <Space direction="vertical" size="middle" style={{ display: 'flex', width: '100%' }}>
+      label: (
+        <Badge count={userMatches.length} size="small" offset={[5, 0]}>
+          您的配對
+        </Badge>
+      ),
+      children: loading ? (
+        <div style={{ padding: '40px 0', textAlign: 'center' }}>
+          <Spin tip="載入中..." />
+        </div>
+      ) : userMatches.length > 0 ? (
+        <Space direction="vertical" size="small" style={{ display: 'flex', width: '100%' }}>
           {userMatches.map((match, index) => (
-            <Card 
-              key={`user-${index}`}
-              title={getMatchTypeName(match)}
-              style={{ borderColor: '#1890ff' }}
-              size="small"
-            >
-              <Table 
-                columns={columns} 
-                dataSource={getMatchTableData(match)}
-                pagination={false}
-                rowClassName={(record: { isCurrentUser: boolean }) => record.isCurrentUser ? 'current-user-row' : ''}
-              />
-            </Card>
+            <MatchCard
+              key={`user-match-${index}`}
+              match={match}
+              currentTeacher={currentTeacher}
+              showDetailedView={true}
+              onShowTeacherInfo={onShowTeacherInfo}
+            />
           ))}
         </Space>
       ) : (
         <Empty description="目前沒有您參與的配對" />
       ),
-      disabled: userMatches.length === 0
+      disabled: userMatches.length === 0 && !loading
     }
   ];
 
@@ -142,27 +87,29 @@ const MatchList: React.FC<MatchListProps> = ({
   if (isDebugMode) {
     items.push({
       key: 'allMatches',
-      label: '所有可能的配對',
-      children: (
-        <Space direction="vertical" size="middle" style={{ display: 'flex', width: '100%' }}>
+      label: (
+        <Badge count={matches.length} size="small" offset={[5, 0]}>
+          所有配對
+        </Badge>
+      ),
+      children: loading ? (
+        <div style={{ padding: '40px 0', textAlign: 'center' }}>
+          <Spin tip="載入中..." />
+        </div>
+      ) : (
+        <Space direction="vertical" size="small" style={{ display: 'flex', width: '100%' }}>
           {matches.map((match, index) => (
-            <Card 
-              key={index}
-              title={getMatchTypeName(match)}
-              size="small"
-            >
-              <Table 
-                columns={columns} 
-                dataSource={getMatchTableData(match)}
-                pagination={false}
-                size="small"
-                rowClassName={(record: { isCurrentUser: boolean }) => record.isCurrentUser ? 'current-user-row' : ''}
-              />
-            </Card>
+            <MatchCard
+              key={`all-match-${index}`}
+              match={match}
+              currentTeacher={currentTeacher}
+              showDetailedView={true}
+              onShowTeacherInfo={onShowTeacherInfo}
+            />
           ))}
         </Space>
       ),
-      disabled: matches.length === 0
+      disabled: matches.length === 0 && !loading
     });
   }
 
@@ -170,12 +117,18 @@ const MatchList: React.FC<MatchListProps> = ({
     <Card
       title={
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title level={4} style={{ margin: 0 }}>{title}</Title>
-          <Button onClick={onBackToForm} icon={<ArrowLeftOutlined />}>返回表單</Button>
+          <Title level={5} style={{ margin: 0 }}>{title}</Title>
+          <Button onClick={onBackToForm} icon={<ArrowLeftOutlined />} size="small">返回</Button>
         </div>
       }
+      bodyStyle={{ padding: '12px' }}
     >
-      <Tabs items={items} defaultActiveKey="userMatches" />
+      <Tabs 
+        items={items} 
+        defaultActiveKey="userMatches"
+        size="small"
+        tabBarStyle={{ marginBottom: 12 }}
+      />
     </Card>
   );
 };

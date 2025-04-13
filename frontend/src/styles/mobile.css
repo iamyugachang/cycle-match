@@ -1,0 +1,179 @@
+/* Mobile-Friendly Styles for CircleMatch */
+
+/* Base responsive adjustments */
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Responsive containers */
+  .mobile-container {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 12px;
+  }
+  
+  /* Improved touch targets for mobile */
+  .mobile-friendly-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Mobile card styles */
+  .mobile-card {
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .mobile-card .ant-card-body {
+    padding: 12px;
+  }
+  
+  .mobile-card .ant-card-head {
+    padding: 0 12px;
+    min-height: 40px;
+  }
+  
+  .mobile-card .ant-card-head-title {
+    padding: 10px 0;
+  }
+  
+  /* Highlighted card for user's matches */
+  .highlighted-card {
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+  
+  .highlighted-card:active {
+    transform: scale(0.98);
+  }
+  
+  /* Teacher switcher card */
+  .teacher-switcher-item {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .teacher-switcher-item:active {
+    background-color: #f0f0f0;
+  }
+  
+  .teacher-switcher-item.active {
+    background-color: #e6f7ff;
+    border-left: 3px solid #1890ff;
+  }
+  
+  /* Mobile header adjustments */
+  .mobile-header {
+    height: auto !important;
+    line-height: 1.5 !important;
+    padding: 8px 16px !important;
+  }
+  
+  /* Current user highlight in match list */
+  .current-user-row {
+    background-color: #e6f7ff;
+  }
+  
+  /* Scrollable tabs for mobile */
+  .scrollable-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .scrollable-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Better mobile footer */
+  .mobile-footer {
+    padding: 12px !important;
+    font-size: 12px;
+  }
+  
+  /* Custom scrollbar for mobile devices */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+  
+  /* Media queries for responsive design */
+  @media (max-width: 576px) {
+    .ant-card-head-title {
+      font-size: 16px !important;
+    }
+    
+    .ant-typography h5 {
+      font-size: 16px !important;
+    }
+    
+    .ant-card-body {
+      padding: 12px;
+    }
+    
+    .ant-form-item {
+      margin-bottom: 16px;
+    }
+  }
+  
+  /* Improve form display on mobile */
+  @media (max-width: 576px) {
+    .ant-form-item-label {
+      padding-bottom: 4px;
+    }
+    
+    .ant-input {
+      height: 40px;
+    }
+    
+    .ant-select-selector {
+      height: 40px !important;
+    }
+    
+    .ant-select-selection-item {
+      line-height: 38px !important;
+    }
+    
+    .ant-btn {
+      height: 40px;
+      padding: 4px 15px;
+    }
+  }
+  
+  /* Touch-friendly adjustments */
+  @media (hover: none) {
+    .ant-btn:not([disabled]):hover {
+      color: inherit;
+      border-color: inherit;
+    }
+    
+    .ant-btn-primary:not([disabled]):hover {
+      color: #fff;
+      border-color: #1890ff;
+      background: #1890ff;
+    }
+  }
