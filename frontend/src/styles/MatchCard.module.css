@@ -91,3 +91,9 @@
       padding: 6px;
     }
   }
+
+  .targetInfo {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+    margin-top: 4px;
+  }

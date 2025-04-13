@@ -102,6 +102,19 @@ const TeacherInfoModal: React.FC<TeacherInfoModalProps> = ({
             <Text strong>介聘代號：</Text>
             <Text>{displayId}</Text>
           </div>
+
+          {teacherInfo?.target_counties && teacherInfo.target_counties.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+              <Text strong>希望調往：</Text>
+              <div style={{ textAlign: 'right', maxWidth: '70%' }}>
+                {teacherInfo.target_counties.map((county, idx) => (
+                  <div key={idx}>
+                    {county} {teacherInfo.target_districts && teacherInfo.target_districts[idx] ? `• ${teacherInfo.target_districts[idx]}` : ''}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </Space>
         
         <div style={{ marginTop: 16 }}>

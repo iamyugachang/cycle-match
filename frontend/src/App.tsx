@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import TeacherProfile from './pages/TeacherProfile';
 import MatchResults from './pages/MatchResults';
 import Login from './pages/Login';
+import NewTeacherForm from './pages/NewTeacherForm';
 import NotFound from './pages/NotFound';
 import Debug from './pages/Debug'; // Import the Debug page
 import ProtectedRoute from './components/ProtectedRoute';
@@ -34,6 +35,12 @@ const App: React.FC = () => {
             
             {/* Debug route */}
             <Route path="/debug" element={<Debug />} />
+
+            <Route path="/new-teacher" element={
+              <ProtectedRoute>
+                <NewTeacherForm />
+              </ProtectedRoute>
+            } />
             
             {/* Protected routes */}
             <Route path="/profile" element={

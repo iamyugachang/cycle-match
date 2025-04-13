@@ -18,7 +18,7 @@ interface TeacherProfilePageProps {
   onUpdateTeacher: (teacher: Teacher) => void;
   onCancelEdit: () => void;
   onShowResults: () => void;
-  onBackToForm?: () => void;
+  onNavigateToNewForm: () => void;
 }
 
 const TeacherProfilePage: React.FC<TeacherProfilePageProps> = ({
@@ -32,7 +32,7 @@ const TeacherProfilePage: React.FC<TeacherProfilePageProps> = ({
   onUpdateTeacher,
   onCancelEdit,
   onShowResults,
-  onBackToForm
+  onNavigateToNewForm
 }) => {
   // If no teachers, show empty state
   if (teachers.length === 0) {
@@ -44,7 +44,7 @@ const TeacherProfilePage: React.FC<TeacherProfilePageProps> = ({
         />
         <Button 
           type="primary"
-          onClick={onBackToForm}
+          onClick={onNavigateToNewForm}
           style={{ marginTop: 20 }}
           size="large"
         >
@@ -79,7 +79,7 @@ const TeacherProfilePage: React.FC<TeacherProfilePageProps> = ({
             <Button 
               type="primary" 
               icon={<PlusOutlined />}
-              onClick={onBackToForm}
+              onClick={onNavigateToNewForm}
             >
               新增介聘資料
             </Button>

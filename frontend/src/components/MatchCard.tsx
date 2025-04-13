@@ -58,6 +58,15 @@ const MatchCard: React.FC<MatchCardProps> = ({
                         {teacher.current_county} • {teacher.current_district} • {teacher.current_school}
                       </Text>
                     </div>
+                    {teacher.target_counties && teacher.target_counties.length > 0 && (
+                      <div className={styles.targetInfo}>
+                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                          希望調往: {teacher.target_counties.map((county, idx) => 
+                            `${county}${teacher.target_districts[idx] ? ` • ${teacher.target_districts[idx]}` : ''}`
+                          ).join(', ')}
+                        </Text>
+                      </div>
+                    )}
                   </div>
                   {onShowTeacherInfo && (
                     <UserOutlined className={styles.infoIcon} />

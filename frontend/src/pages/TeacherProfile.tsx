@@ -28,9 +28,7 @@ const TeacherProfile: React.FC = () => {
   
   // If all teachers is empty and not showing form, show form
   useEffect(() => {
-    if (userVM.allTeachers.length === 0 && !showForm) {
-      setShowForm(true);
-    }
+    setShowForm(userVM.allTeachers.length === 0);
   }, [userVM.allTeachers, showForm]);
   
   // Handle create teacher submission
@@ -70,10 +68,6 @@ const TeacherProfile: React.FC = () => {
     navigate('/matches');
   };
   
-  const handleBackToForm = () => {
-    setShowForm(true);
-  };
-  
   // Logout handler
   const handleLogout = () => {
     userVM.logout();
@@ -100,6 +94,10 @@ const TeacherProfile: React.FC = () => {
     localStorage.removeItem('debug_authenticated');
     matchVM.disableDebugMode();
     navigate('/');
+  };
+
+  const handleNavigateToNewForm = () => {
+    navigate('/new-teacher');
   };
 
   return (
@@ -168,7 +166,7 @@ const TeacherProfile: React.FC = () => {
               onUpdateTeacher={userVM.updateTeacher}
               onCancelEdit={userVM.cancelEditingTeacher}
               onShowResults={handleShowResults}
-              onBackToForm={handleBackToForm}
+              onNavigateToNewForm={handleNavigateToNewForm}
             />
           )}
         </Space>
