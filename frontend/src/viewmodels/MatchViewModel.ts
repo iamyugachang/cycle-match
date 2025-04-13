@@ -85,25 +85,17 @@ export const useMatchViewModel = (currentTeacher: Teacher | null, allTeachers: T
       match.teachers.some(teacher => teacher.year === currentYear)
     );
     
-    // If debug mode with user view enabled, show only matches for current teacher
-    if (isDebugMode && userView) {
-      // Only show matches involving the current teacher
-      return yearMatches.filter(match => 
-        match.teachers.some(teacher => currentTeacher && teacher.id === currentTeacher.id)
-      );
-    }
-    
-    // Debug mode shows all matches
+    // If debug mode and all matches view is enabled
     if (isDebugMode && !userView) {
       return yearMatches;
     }
     
-    // Normal mode: only show matches for the current teacher
+    // Normal mode or debug mode with user view: show only matches directly involving the current teacher
     if (!currentTeacher) {
       return [];
     }
     
-    // Only show matches involving the current teacher
+    // Only show matches involving the current teacher (directly)
     return yearMatches.filter(match => 
       match.teachers.some(teacher => teacher.id === currentTeacher.id)
     );
