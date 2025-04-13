@@ -1,0 +1,77 @@
+/* TeacherActionButtons.module.css */
+
+.actionContainer {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .moreButton {
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 20px !important;
+    padding: 0 !important;
+  }
+  
+  .moreButton:hover {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+  }
+  
+  .moreButton:active {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+  }
+  
+  .actionButton {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    min-height: 32px !important;
+  }
+  
+  /* Dropdown menu customization */
+  :global(.ant-dropdown-menu-item) {
+    padding: 10px 12px !important;
+  }
+  
+  :global(.ant-dropdown-menu-item-icon) {
+    font-size: 16px !important;
+  }
+  
+  /* For touch devices */
+  @media (hover: none) {
+    .moreButton {
+      background-color: transparent !important;
+    }
+    
+    .actionButton {
+      height: 40px !important;
+      padding: 8px 16px !important;
+    }
+  }
+  
+  /* Confirmation dialog for mobile */
+  .confirmDialog {
+    width: 100% !important;
+    max-width: 320px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+  
+  .confirmDialogContent {
+    padding: 16px !important;
+    text-align: center !important;
+  }
+  
+  .confirmDialogButtons {
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 16px !important;
+  }
+  
+  .confirmButton {
+    flex: 1 !important;
+    height: 40px !important;
+  }

@@ -1,0 +1,106 @@
+/* EditTeacherForm.module.css */
+
+.mobileHeader {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #fff;
+    padding: 8px 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 12px;
+    width: 100%;
+  }
+  
+  .mobileHeaderTitle {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    padding: 0 8px;
+  }
+  
+  .mobileContent {
+    padding: 0 12px;
+    margin-bottom: 70px; /* Space for floating action button */
+  }
+  
+  .mobileFooter {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px;
+    background-color: #fff;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .floatingActionButton {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10;
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .headerBackButton {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .headerSaveButton {
+    font-size: 14px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto; /* Push to the right */
+    min-width: 80px; /* Ensure minimum width */
+  }
+  
+  /* For tablet sizes */
+  @media (min-width: 577px) and (max-width: 768px) {
+    .mobileContent {
+      padding: 0 16px;
+    }
+  }
+  
+  /* Touch-friendly form elements */
+  .touchFriendlyForm :global(.ant-form-item-label) > label {
+    height: 32px;
+  }
+  
+  .touchFriendlyForm :global(.ant-input),
+  .touchFriendlyForm :global(.ant-select-selector),
+  .touchFriendlyForm :global(.ant-btn) {
+    height: 44px;
+  }
+  
+  .touchFriendlyForm :global(.ant-select-selection-search-input) {
+    height: 42px !important;
+  }
+  
+  .touchFriendlyForm :global(.ant-select-selection-item) {
+    line-height: 42px !important;
+  }
+  
+  /* Error alert styling */
+  .errorAlert {
+    margin-bottom: 16px;
+    border-radius: 4px;
+  }
